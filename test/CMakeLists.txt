@@ -7,9 +7,11 @@ enable_testing()
 set(SOURCE_FILES source/AudioProcessorTest.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${GOOGLETEST_SOURCE_DIR}/googletest/include)
+target_include_directories(${PROJECT_NAME} PRIVATE 
+${GOOGLETEST_SOURCE_DIR}/googletest/include
+${CMAKE_SOURCE_DIR}/plugin/include)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE AudioPlugin GTest::gtest_main)
+target_link_libraries(${PROJECT_NAME} PRIVATE SimpleParametricEq GTest::gtest_main)
 
 set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_OPTIONS "${PROJECT_WARNINGS_CXX}")
 

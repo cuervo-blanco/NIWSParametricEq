@@ -3,7 +3,6 @@
 #include "PluginProcessor.h"
 
 namespace parametric_eq {
-
 class AudioPluginAudioProcessorEditor : public juce::AudioProcessorEditor {
 public:
   explicit AudioPluginAudioProcessorEditor(AudioPluginAudioProcessor&);

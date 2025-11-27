@@ -3,6 +3,6 @@
 
 namespace parametric_eq_test {
 TEST(AudioProcessor, Foo) {
-  audio_plugin::AudioPluginAudioProcessor processor{};
+  parametric_eq::AudioPluginAudioProcessor processor{};
 }
-}  // namespace audio_plugin_test
+}  // namespace parametric_eq_test

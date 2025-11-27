@@ -26,14 +26,17 @@ juce_add_plugin(
   "Simple Parametric EQ"
 )
 
-set(SOURCE_FILES source/PluginEditor.cpp source/PluginProcessor.cpp)
+set(SOURCE_FILES source/PluginEditor.cpp source/PluginProcessor.cpp
+source/components/NotchFilter.cpp source/ParametricEq.cpp source/Parameters.cpp)
 
-set(HEADER_FILES ${INCLUDE_DIR}/PluginEditor.h ${INCLUDE_DIR}/PluginProcessor.h)
+set(HEADER_FILES ${INCLUDE_DIR}/PluginEditor.h ${INCLUDE_DIR}/PluginProcessor.h
+${INCLUDE_DIR}/components/NotchFilter.h ${INCLUDE_DIR}/ParametricEq.h ${INCLUDE_DIR}/Parameters.h)
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES} ${HEADER_FILES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries_system(${PROJECT_NAME} PUBLIC juce::juce_audio_utils)
+target_link_libraries_system(${PROJECT_NAME} PUBLIC juce::juce_audio_utils
+juce::juce_dsp juce::juce_audio_processors)
 target_link_libraries(
   ${PROJECT_NAME} PUBLIC juce::juce_recommended_config_flags juce::juce_recommended_lto_flags
                          juce::juce_recommended_warning_flags

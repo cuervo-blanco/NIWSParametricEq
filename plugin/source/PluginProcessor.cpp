@@ -49,9 +49,7 @@ double AudioPluginAudioProcessor::getTailLengthSeconds() const {
 }
 
 int AudioPluginAudioProcessor::getNumPrograms() {
-  return 1;  // NB: some hosts don't cope very well if you tell them there are 0
-             // programs, so this should be at least 1, even if you're not
-             // really implementing programs.
+  return 1;
 }
 
 int AudioPluginAudioProcessor::getCurrentProgram() {
@@ -74,7 +72,8 @@ void AudioPluginAudioProcessor::changeProgramName(int index,
 
 void AudioPluginAudioProcessor::prepareToPlay(double sampleRate,
                                               int samplesPerBlock) {
-  juce::ignoreUnused(sampleRate, samplesPerBlock);
+  juce::ignoreUnused(samplesPerBlock);
+  parametricEq_.prepare(sampleRate);
 }
 
 void AudioPluginAudioProcessor::releaseResources() {
@@ -108,14 +107,11 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   auto totalNumOutputChannels = getTotalNumOutputChannels();
 
   // This is here to avoid people getting screaming feedback
-  for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+  for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
     buffer.clear(i, 0, buffer.getNumSamples());
-
-  for (int channel = 0; channel < totalNumInputChannels; ++channel) {
-    auto* channelData = buffer.getWritePointer(channel);
-    juce::ignoreUnused(channelData);
-    // ..do something to the data...
   }
+
+  parametricEq_.processBlock(buffer);
 }
 
 bool AudioPluginAudioProcessor::hasEditor() const {
@@ -138,5 +134,5 @@ void AudioPluginAudioProcessor::setStateInformation(const void* data,
 }  // namespace parametric_eq
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
-  return new audio_plugin::AudioPluginAudioProcessor();
+  return new parametric_eq::AudioPluginAudioProcessor();
 }
