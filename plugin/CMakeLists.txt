@@ -24,13 +24,15 @@ juce_add_plugin(
   AU
   PRODUCT_NAME
   "Simple Parametric EQ"
+  COPY_PLUGIN_AFTER_BUILD
+  TRUE
 )
 
 set(SOURCE_FILES source/PluginEditor.cpp source/PluginProcessor.cpp
-source/components/NotchFilter.cpp source/ParametricEq.cpp source/Parameters.cpp)
+source/components/PeakFilter.cpp source/ParametricEq.cpp source/Parameters.cpp)
 
 set(HEADER_FILES ${INCLUDE_DIR}/PluginEditor.h ${INCLUDE_DIR}/PluginProcessor.h
-${INCLUDE_DIR}/components/NotchFilter.h ${INCLUDE_DIR}/ParametricEq.h ${INCLUDE_DIR}/Parameters.h)
+${INCLUDE_DIR}/components/PeakFilter.h ${INCLUDE_DIR}/ParametricEq.h ${INCLUDE_DIR}/Parameters.h)
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES} ${HEADER_FILES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

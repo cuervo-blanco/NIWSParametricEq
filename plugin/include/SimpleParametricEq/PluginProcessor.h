@@ -2,6 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "ParametricEq.h"
+#include "Parameters.h"
 
 namespace parametric_eq {
 class AudioPluginAudioProcessor : public juce::AudioProcessor {
@@ -38,6 +39,8 @@ public:
 
 private:
   ParametricEq parametricEq_;
+  Parameters parameters_{*this};
+
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessor)
 };
 }  // namespace parametric_eq
