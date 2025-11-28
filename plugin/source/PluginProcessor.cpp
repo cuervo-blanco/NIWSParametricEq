@@ -112,8 +112,8 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     buffer.clear(i, 0, buffer.getNumSamples());
   }
 
-  for (size_t i = 0; i < ParametricEq::NUM_BANDS; i++) {
-    parametricEq_.setBandParameters(
+  for (size_t i = 0; i < ParametricEq::NUM_PEAKS; i++) {
+    parametricEq_.setPeakParameters(
       i, 
       static_cast<double>(parameters_.peakFreqs[i]->get()),
       static_cast<double>(parameters_.peakQs[i]->get()), 

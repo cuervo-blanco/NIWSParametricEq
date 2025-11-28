@@ -8,9 +8,9 @@ namespace parametric_eq {
 struct Parameters {
     explicit Parameters(juce::AudioProcessor&);
 
-    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_BANDS> peakFreqs{};
-    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_BANDS> peakQs{};
-    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_BANDS> peakGains{};
+    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_PEAKS> peakFreqs{};
+    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_PEAKS> peakQs{};
+    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_PEAKS> peakGains{};
 
     JUCE_DECLARE_NON_COPYABLE(Parameters)
     JUCE_DECLARE_NON_MOVEABLE(Parameters)

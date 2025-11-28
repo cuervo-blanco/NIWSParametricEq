@@ -4,7 +4,7 @@ namespace parametric_eq {
 void ParametricEq::prepare(double sampleRate, int numChannels) {
     sampleRate_ = sampleRate;
     numChannels_ = numChannels;
-    prepareBandFilters();
+    preparePeakFilters();
 }
 
 void ParametricEq::reset() {
@@ -19,7 +19,7 @@ void ParametricEq::processBlock(juce::AudioBuffer<float>& buffer) {
     }
 }
 
-void ParametricEq::prepareBandFilters() {
+void ParametricEq::preparePeakFilters() {
     auto totalBandFilters = static_cast<int>(peakFilters_.size());
     for (int i = 0; i < totalBandFilters; ++i) {
         jassert(static_cast<size_t>(i) < NUM_PEAKS);
@@ -29,7 +29,7 @@ void ParametricEq::prepareBandFilters() {
     }
 }
 
-void ParametricEq::setBandParameters(size_t bandIndex, double frequency, double Q, float gainDb) {
+void ParametricEq::setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb) {
     if (bandIndex >= peakFilters_.size() || bandIndex < 0) {
         return;
     } else if (bandIndex < peakFilters_.size() && bandIndex >= 0) {

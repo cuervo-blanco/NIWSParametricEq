@@ -17,10 +17,11 @@ public:
     void reset();
     void processBlock(juce::AudioBuffer<float>& buffer);
 
-    void prepareBandFilters();
-    void setBandParameters(size_t bandIndex, double frequency, double Q, float gainDb);
+    void preparePeakFilters();
+    void setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb);
 private:
     std::array<PeakFilter, NUM_PEAKS> peakFilters_;
+    LowShelfFilter lowShelfFilter_;
     double sampleRate_{44100.0};
     int numChannels_;
 };
