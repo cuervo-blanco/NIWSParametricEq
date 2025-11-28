@@ -1,8 +1,9 @@
 #include "SimpleParametricEq/ParametricEq.h"
 
 namespace parametric_eq {
-void ParametricEq::prepare(double sampleRate) {
+void ParametricEq::prepare(double sampleRate, int numChannels) {
     sampleRate_ = sampleRate;
+    numChannels_ = numChannels;
     prepareBandFilters();
 }
 
@@ -21,9 +22,10 @@ void ParametricEq::processBlock(juce::AudioBuffer<float>& buffer) {
 void ParametricEq::prepareBandFilters() {
     auto totalBandFilters = static_cast<int>(peakFilters_.size());
     for (int i = 0; i < totalBandFilters; ++i) {
-        jassert(static_cast<size_t>(i) < NUM_BANDS);
+        jassert(static_cast<size_t>(i) < NUM_PEAKS);
         auto freq = *std::next(DEFAULT_FREQS.begin(), i);
-        peakFilters_[static_cast<size_t>(i)].prepare(sampleRate_, freq, 1.0);
+        peakFilters_[static_cast<size_t>(i)].prepare(sampleRate_, numChannels_);
+        peakFilters_[static_cast<size_t>(i)].setParametersAndReset(freq, 1.0);
     }
 }
 

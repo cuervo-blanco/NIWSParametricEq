@@ -73,7 +73,8 @@ void AudioPluginAudioProcessor::changeProgramName(int index,
 void AudioPluginAudioProcessor::prepareToPlay(double sampleRate,
                                               int samplesPerBlock) {
   juce::ignoreUnused(samplesPerBlock);
-  parametricEq_.prepare(sampleRate);
+  auto numChannels = std::min(getTotalNumInputChannels(), getTotalNumOutputChannels());
+  parametricEq_.prepare(sampleRate, numChannels);
 }
 
 void AudioPluginAudioProcessor::releaseResources() {

@@ -8,10 +8,10 @@ auto& addParameterToProcessor(juce::AudioProcessor& processor, auto parameter) {
   return result;
 }
 
-std::array<juce::AudioParameterFloat*, ParametricEq::NUM_BANDS> createPeakFreqsParameters(juce::AudioProcessor& processor) {
-    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_BANDS> parameters{};
+std::array<juce::AudioParameterFloat*, ParametricEq::NUM_PEAKS> createPeakFreqsParameters(juce::AudioProcessor& processor) {
+    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_PEAKS> parameters{};
     constexpr auto versionHint = 1;
-    for (size_t i = 0; i < ParametricEq::NUM_BANDS; i++) {
+    for (size_t i = 0; i < ParametricEq::NUM_PEAKS; i++) {
         juce::String id = "peakFreq" + juce::String(i + 1);
         juce::String name = "Peak " + juce::String(i + 1) + " Frequency";
         parameters[i] = &addParameterToProcessor(
@@ -25,10 +25,10 @@ std::array<juce::AudioParameterFloat*, ParametricEq::NUM_BANDS> createPeakFreqsP
     return parameters;
 }
 
-std::array<juce::AudioParameterFloat*, ParametricEq::NUM_BANDS> createPeakQsParameters(juce::AudioProcessor& processor) {
-    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_BANDS> parameters{};
+std::array<juce::AudioParameterFloat*, ParametricEq::NUM_PEAKS> createPeakQsParameters(juce::AudioProcessor& processor) {
+    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_PEAKS> parameters{};
     constexpr auto versionHint = 1;
-    for (size_t i = 0; i < ParametricEq::NUM_BANDS; i++) {
+    for (size_t i = 0; i < ParametricEq::NUM_PEAKS; i++) {
         juce::String id = "peakQ" + juce::String(i + 1);
         juce::String name = "Peak " + juce::String(i + 1) + " Q-Factor";
         parameters[i] = &addParameterToProcessor(
@@ -42,10 +42,10 @@ std::array<juce::AudioParameterFloat*, ParametricEq::NUM_BANDS> createPeakQsPara
     return parameters;
 }
 
-std::array<juce::AudioParameterFloat*, ParametricEq::NUM_BANDS> createPeakGainsParameters(juce::AudioProcessor& processor) {
-    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_BANDS> parameters{};
+std::array<juce::AudioParameterFloat*, ParametricEq::NUM_PEAKS> createPeakGainsParameters(juce::AudioProcessor& processor) {
+    std::array<juce::AudioParameterFloat*, ParametricEq::NUM_PEAKS> parameters{};
     constexpr auto versionHint = 1;
-    for (size_t i = 0; i < ParametricEq::NUM_BANDS; i++) {
+    for (size_t i = 0; i < ParametricEq::NUM_PEAKS; i++) {
         juce::String id = "peakGain" + juce::String(i + 1);
         juce::String name = "Peak " + juce::String(i + 1) + " Gain";
         parameters[i] = &addParameterToProcessor(

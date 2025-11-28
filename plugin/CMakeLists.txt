@@ -29,16 +29,17 @@ juce_add_plugin(
 )
 
 set(SOURCE_FILES source/PluginEditor.cpp source/PluginProcessor.cpp
-source/components/PeakFilter.cpp source/ParametricEq.cpp source/Parameters.cpp)
+source/ParametricEq.cpp source/Parameters.cpp)
 
 set(HEADER_FILES ${INCLUDE_DIR}/PluginEditor.h ${INCLUDE_DIR}/PluginProcessor.h
-${INCLUDE_DIR}/components/PeakFilter.h ${INCLUDE_DIR}/ParametricEq.h ${INCLUDE_DIR}/Parameters.h)
+${INCLUDE_DIR}/filters/BiquadFilter.h ${INCLUDE_DIR}/filters/PeakFilter.h ${INCLUDE_DIR}/filters/LowShelfFilter.h
+${INCLUDE_DIR}/ParametricEq.h ${INCLUDE_DIR}/Parameters.h)
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES} ${HEADER_FILES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_link_libraries_system(${PROJECT_NAME} PUBLIC juce::juce_audio_utils
-juce::juce_dsp juce::juce_audio_processors)
+juce::juce_dsp juce::juce_audio_processors juce::juce_audio_basics)
 target_link_libraries(
   ${PROJECT_NAME} PUBLIC juce::juce_recommended_config_flags juce::juce_recommended_lto_flags
                          juce::juce_recommended_warning_flags
