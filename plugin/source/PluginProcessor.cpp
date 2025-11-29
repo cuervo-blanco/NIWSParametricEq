@@ -113,18 +113,19 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   }
 
   for (size_t i = 0; i < ParametricEq::NUM_PEAKS; i++) {
+    const auto& peak = parameters_.peakFilters[i];
     parametricEq_.setPeakParameters(
       i, 
-      static_cast<double>(parameters_.peakFreqs[i]->get()),
-      static_cast<double>(parameters_.peakQs[i]->get()), 
-      parameters_.peakGains[i]->get()
+      static_cast<double>(peak->base.frequency.get()),
+      static_cast<double>(peak->base.qFactor.get()), 
+      peak->gain.get()
     );
   }
 
   parametricEq_.setLowShelfParameters(
-    static_cast<double>(parameters_.lowShelfParameters.lowShelfFrequency.get()),
-    static_cast<double>(parameters_.lowShelfParameters.lowShelfQ.get()),
-    parameters_.lowShelfParameters.lowShelfGain.get()
+    static_cast<double>(parameters_.lowShelfParameters.base.frequency.get()),
+    static_cast<double>(parameters_.lowShelfParameters.base.qFactor.get()),
+    parameters_.lowShelfParameters.gain.get()
   );
 
   parametricEq_.processBlock(buffer);

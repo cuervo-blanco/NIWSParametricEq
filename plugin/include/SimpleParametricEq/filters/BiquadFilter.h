@@ -7,7 +7,6 @@
 class BiquadFilter {
 public:
     virtual ~BiquadFilter() = default;
-
     virtual void prepare(double sampleRate, int numChannels) {
         sampleRate_ = sampleRate;
         numChannels_ = numChannels;
