@@ -17,8 +17,9 @@ public:
     void reset();
     void processBlock(juce::AudioBuffer<float>& buffer);
 
-    void preparePeakFilters();
+    void prepareFilters();
     void setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb);
+    void setLowShelfParameters(double frequency, double Q, float gainDb);
 private:
     std::array<PeakFilter, NUM_PEAKS> peakFilters_;
     LowShelfFilter lowShelfFilter_;

@@ -121,6 +121,12 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     );
   }
 
+  parametricEq_.setLowShelfParameters(
+    static_cast<double>(parameters_.lowShelfParameters.lowShelfFrequency.get()),
+    static_cast<double>(parameters_.lowShelfParameters.lowShelfQ.get()),
+    parameters_.lowShelfParameters.lowShelfGain.get()
+  );
+
   parametricEq_.processBlock(buffer);
 }
 

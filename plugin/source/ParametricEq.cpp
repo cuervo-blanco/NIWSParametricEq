@@ -4,22 +4,24 @@ namespace parametric_eq {
 void ParametricEq::prepare(double sampleRate, int numChannels) {
     sampleRate_ = sampleRate;
     numChannels_ = numChannels;
-    preparePeakFilters();
+    prepareFilters();
 }
 
 void ParametricEq::reset() {
     for (auto &filter : peakFilters_) {
         filter.reset();
     }
+    lowShelfFilter_.reset();
 }
 
 void ParametricEq::processBlock(juce::AudioBuffer<float>& buffer) {
     for (auto &filter : peakFilters_) {
         filter.processBlock(buffer);
     }
+    lowShelfFilter_.processBlock(buffer);
 }
 
-void ParametricEq::preparePeakFilters() {
+void ParametricEq::prepareFilters() {
     auto totalBandFilters = static_cast<int>(peakFilters_.size());
     for (int i = 0; i < totalBandFilters; ++i) {
         jassert(static_cast<size_t>(i) < NUM_PEAKS);
@@ -27,6 +29,9 @@ void ParametricEq::preparePeakFilters() {
         peakFilters_[static_cast<size_t>(i)].prepare(sampleRate_, numChannels_);
         peakFilters_[static_cast<size_t>(i)].setParametersAndReset(freq, 1.0);
     }
+
+    lowShelfFilter_.prepare(sampleRate_, numChannels_);
+    lowShelfFilter_.setParametersAndReset(80.0, 1.0);
 }
 
 void ParametricEq::setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb) {
@@ -37,5 +42,11 @@ void ParametricEq::setPeakParameters(size_t bandIndex, double frequency, double 
         peakFilters_[bandIndex].setQ(Q);
         peakFilters_[bandIndex].setAmplitude(gainDb);
     }
+}
+
+void ParametricEq::setLowShelfParameters(double frequency, double Q, float gainDb) {
+    lowShelfFilter_.setFrequency(frequency);
+    lowShelfFilter_.setQ(Q);
+    lowShelfFilter_.setAmplitude(gainDb);
 }
 } // namespace parametric_eq
