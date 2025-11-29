@@ -109,9 +109,45 @@ std::array<std::unique_ptr<BoostCutParameters>, ParametricEq::NUM_PEAKS> createP
     }
     return parameters;
 }
+
+BaseParameters createLowPassParameters(juce::AudioProcessor& processor) {
+    auto versionHint = 1;
+    Identifier frequencyIdentifier = {"lowPassFrequency", "Low Pass Frequency", versionHint};
+    Identifier qIdentifier = {"lowPassQ", "Low Pass Q-Factor", versionHint};
+    Identifier bypassIdentifier = {"lowPassBypass", "Low Pass Bypass", versionHint};
+    Identifier slopeIdentifier = {"lowPassSlope", "Low Pass Slope", versionHint};
+
+    auto& frequency = createFrequencyParameter(processor, frequencyIdentifier, 40.f);
+    auto& q = createQParameter(processor, qIdentifier);
+    auto& slope = createSlopeParameter(processor, slopeIdentifier);
+    auto& bypassed = createBypassedParameter(processor, bypassIdentifier);
+
+    BaseParameters parameters = {frequency, q, slope, bypassed};
+
+    return parameters;
+}
+
+BaseParameters createHighPassParameters(juce::AudioProcessor& processor) {
+    auto versionHint = 1;
+    Identifier frequencyIdentifier = {"highPassFrequency", "High Pass Frequency", versionHint};
+    Identifier qIdentifier = {"highPassQ", "High Pass Q-Factor", versionHint};
+    Identifier bypassIdentifier = {"highPassBypass", "High Pass Bypass", versionHint};
+    Identifier slopeIdentifier = {"highPassSlope", "High Pass Slope", versionHint};
+
+    auto& frequency = createFrequencyParameter(processor, frequencyIdentifier, 15000.f);
+    auto& q = createQParameter(processor, qIdentifier);
+    auto& slope = createSlopeParameter(processor, slopeIdentifier);
+    auto& bypassed = createBypassedParameter(processor, bypassIdentifier);
+
+    BaseParameters parameters = {frequency, q, slope, bypassed};
+
+    return parameters;
+}
 } // namespace
 
 Parameters::Parameters(juce::AudioProcessor& processor)
       : peakFilters{createPeakFilterParameters(processor)},
-      lowShelfParameters{createLowShelfParameters(processor)} {}
+      lowShelfParameters{createLowShelfParameters(processor)},  
+      lowPassParameters{createLowPassParameters(processor)},
+      highPassParameters{createHighPassParameters(processor)} {}
 }  // namespace parametric_eq

@@ -10,7 +10,9 @@ struct Parameters {
     explicit Parameters(juce::AudioProcessor&);
 
     std::array<std::unique_ptr<BoostCutParameters>, ParametricEq::NUM_PEAKS> peakFilters;
-    BoostCutParameters lowShelfParameters;
+    BoostCutParameters lowShelfParameters; 
+    BaseParameters lowPassParameters;
+    BaseParameters highPassParameters;
 
     JUCE_DECLARE_NON_COPYABLE(Parameters)
     JUCE_DECLARE_NON_MOVEABLE(Parameters)
