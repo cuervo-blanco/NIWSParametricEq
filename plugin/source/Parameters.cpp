@@ -117,7 +117,7 @@ BaseParameters createLowPassParameters(juce::AudioProcessor& processor) {
     Identifier bypassIdentifier = {"lowPassBypass", "Low Pass Bypass", versionHint};
     Identifier slopeIdentifier = {"lowPassSlope", "Low Pass Slope", versionHint};
 
-    auto& frequency = createFrequencyParameter(processor, frequencyIdentifier, 40.f);
+    auto& frequency = createFrequencyParameter(processor, frequencyIdentifier, 15000.f);
     auto& q = createQParameter(processor, qIdentifier);
     auto& slope = createSlopeParameter(processor, slopeIdentifier);
     auto& bypassed = createBypassedParameter(processor, bypassIdentifier);
@@ -134,7 +134,7 @@ BaseParameters createHighPassParameters(juce::AudioProcessor& processor) {
     Identifier bypassIdentifier = {"highPassBypass", "High Pass Bypass", versionHint};
     Identifier slopeIdentifier = {"highPassSlope", "High Pass Slope", versionHint};
 
-    auto& frequency = createFrequencyParameter(processor, frequencyIdentifier, 15000.f);
+    auto& frequency = createFrequencyParameter(processor, frequencyIdentifier, 40.f);
     auto& q = createQParameter(processor, qIdentifier);
     auto& slope = createSlopeParameter(processor, slopeIdentifier);
     auto& bypassed = createBypassedParameter(processor, bypassIdentifier);

@@ -19,6 +19,8 @@ void ParametricEq::processBlock(juce::AudioBuffer<float>& buffer) {
         filter.processBlock(buffer);
     }
     lowShelfFilter_.processBlock(buffer);
+    lowPassFilter_.processBlock(buffer);
+    highPassFilter_.processBlock(buffer);
 }
 
 void ParametricEq::prepareFilters() {
@@ -34,10 +36,10 @@ void ParametricEq::prepareFilters() {
     lowShelfFilter_.setParametersAndReset(80.0, 1.0);
 
     lowPassFilter_.prepare(sampleRate_, numChannels_);
-    lowPassFilter_.setParametersAndReset(30.0, 1.0);
+    lowPassFilter_.setParametersAndReset(150000.0, 1.0);
 
     highPassFilter_.prepare(sampleRate_, numChannels_);
-    highPassFilter_.setParametersAndReset(15000.0, 1.0);
+    highPassFilter_.setParametersAndReset(40.0, 1.0);
 }
 
 void ParametricEq::setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb) {
