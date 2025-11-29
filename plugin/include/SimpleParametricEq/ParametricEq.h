@@ -2,11 +2,12 @@
 #include <juce_dsp/juce_dsp.h>
 #include "SimpleParametricEq/filters/PeakFilter.h"
 #include "SimpleParametricEq/filters/LowShelfFilter.h"
+#include "SimpleParametricEq/filters/LowPassFilter.h"
+#include "SimpleParametricEq/filters/HighPassFilter.h"
 
 namespace parametric_eq {
 class ParametricEq {
 public:
-    // Fixed for now
     static size_t const NUM_PEAKS = 4;
     static std::array<double, NUM_PEAKS> constexpr DEFAULT_FREQS = {100.0, 250.0, 1050.0, 2500.0};
 
@@ -18,11 +19,17 @@ public:
     void processBlock(juce::AudioBuffer<float>& buffer);
 
     void prepareFilters();
+
     void setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb);
     void setLowShelfParameters(double frequency, double Q, float gainDb);
+    void setLowPassParameters(double frequency, double Q);
+    void setHighPassParameters(double frequency, double Q);
 private:
     std::array<PeakFilter, NUM_PEAKS> peakFilters_;
     LowShelfFilter lowShelfFilter_;
+    LowPassFilter lowPassFilter_;
+    HighPassFilter highPassFilter_;
+
     double sampleRate_{44100.0};
     int numChannels_;
 };

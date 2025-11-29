@@ -32,6 +32,12 @@ void ParametricEq::prepareFilters() {
 
     lowShelfFilter_.prepare(sampleRate_, numChannels_);
     lowShelfFilter_.setParametersAndReset(80.0, 1.0);
+
+    lowPassFilter_.prepare(sampleRate_, numChannels_);
+    lowPassFilter_.setParametersAndReset(30.0, 1.0);
+
+    highPassFilter_.prepare(sampleRate_, numChannels_);
+    highPassFilter_.setParametersAndReset(15000.0, 1.0);
 }
 
 void ParametricEq::setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb) {
@@ -49,4 +55,15 @@ void ParametricEq::setLowShelfParameters(double frequency, double Q, float gainD
     lowShelfFilter_.setQ(Q);
     lowShelfFilter_.setAmplitude(gainDb);
 }
+
+void ParametricEq::setLowPassParameters(double frequency, double Q) {
+    lowPassFilter_.setFrequency(frequency);
+    lowPassFilter_.setQ(Q);
+}
+
+void ParametricEq::setHighPassParameters(double frequency, double Q) {
+    highPassFilter_.setFrequency(frequency);
+    highPassFilter_.setQ(Q);
+}
+
 } // namespace parametric_eq
