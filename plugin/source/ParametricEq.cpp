@@ -42,6 +42,15 @@ void ParametricEq::prepareFilters() {
     highPassFilter_.setParametersAndReset(40.0, 1.0);
 }
 
+void ParametricEq::setBypassed(bool isBypassed){
+    for (size_t i = 0; i < NUM_PEAKS; i++) {
+        peakFilters_[i].setBypassed(isBypassed);
+    }
+    lowShelfFilter_.setBypassed(isBypassed);
+    lowPassFilter_.setBypassed(isBypassed);
+    highPassFilter_.setBypassed(isBypassed);
+}
+
 void ParametricEq::setPeakParameters(size_t bandIndex, 
     double frequency, double Q, float gainDb, bool isBypassed) {
     if (bandIndex >= peakFilters_.size() || bandIndex < 0) {

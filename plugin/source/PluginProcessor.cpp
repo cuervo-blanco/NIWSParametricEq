@@ -145,6 +145,7 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     highPass.bypassed.get()
   );
 
+  parametricEq_.setBypassed(parameters_.bypassed.get());
   parametricEq_.processBlock(buffer);
 }
 
@@ -164,6 +165,10 @@ void AudioPluginAudioProcessor::getStateInformation(
 void AudioPluginAudioProcessor::setStateInformation(const void* data,
                                                     int sizeInBytes) {
   juce::ignoreUnused(data, sizeInBytes);
+}
+
+juce::AudioProcessorParameter* AudioPluginAudioProcessor::getBypassParameter() const {
+  return &parameters_.bypassed;
 }
 }  // namespace parametric_eq
 

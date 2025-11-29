@@ -9,6 +9,8 @@ namespace parametric_eq {
 struct Parameters {
     explicit Parameters(juce::AudioProcessor&);
 
+    juce::AudioParameterBool& bypassed; 
+
     std::array<std::unique_ptr<BoostCutParameters>, ParametricEq::NUM_PEAKS> peakFilters;
     BoostCutParameters lowShelfParameters; 
     BaseParameters lowPassParameters;

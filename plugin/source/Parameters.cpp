@@ -51,7 +51,9 @@ juce::AudioParameterBool& createBypassedParameter(
   return addParameterToProcessor(
       processor,
       std::make_unique<juce::AudioParameterBool>(
-          juce::ParameterID{identifier.id, identifier.versionHint}, identifier.name, false));
+          juce::ParameterID{identifier.id, identifier.versionHint}, 
+          identifier.name, 
+          false));
 }
 
 juce::AudioParameterChoice& createSlopeParameter(
@@ -146,7 +148,8 @@ BaseParameters createHighPassParameters(juce::AudioProcessor& processor) {
 } // namespace
 
 Parameters::Parameters(juce::AudioProcessor& processor)
-      : peakFilters{createPeakFilterParameters(processor)},
+      : bypassed(createBypassedParameter(processor, {"bypassed", "Bypass", 1})),
+      peakFilters{createPeakFilterParameters(processor)},
       lowShelfParameters{createLowShelfParameters(processor)},  
       lowPassParameters{createLowPassParameters(processor)},
       highPassParameters{createHighPassParameters(processor)} {}
