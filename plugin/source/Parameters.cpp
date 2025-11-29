@@ -15,13 +15,13 @@ auto& addParameterToProcessor(juce::AudioProcessor& processor, auto parameter) {
   return result;
 }
 
-juce::AudioParameterFloat& createFrequencyParameter(juce::AudioProcessor& processor, Identifier identifier){
+juce::AudioParameterFloat& createFrequencyParameter(juce::AudioProcessor& processor, Identifier identifier, float defaultFreq = 1000.f){
     return addParameterToProcessor(
         processor,
         std::make_unique<juce::AudioParameterFloat>(
             juce::ParameterID{identifier.id, identifier.versionHint}, identifier.name,
             juce::NormalisableRange<float>{20.f, 20000.f, 1.f, 0.4f}, 
-            80.0f,
+            defaultFreq,
             juce::AudioParameterFloatAttributes{}.withLabel("Hz")));
 }
 
@@ -72,7 +72,7 @@ BoostCutParameters createLowShelfParameters(juce::AudioProcessor& processor) {
     Identifier bypassIdentifier = {"lowShelfBypass", "Low Shelf Bypass", versionHint};
     Identifier slopeIdentifier = {"lowShelfSlope", "Low Shelf Slope", versionHint};
 
-    auto& frequency = createFrequencyParameter(processor, frequencyIdentifier);
+    auto& frequency = createFrequencyParameter(processor, frequencyIdentifier, 80.f);
     auto& q = createQParameter(processor, qIdentifier);
     auto& gain = createGainParameter(processor, gainIdentifier);
     auto& slope = createSlopeParameter(processor, slopeIdentifier);
@@ -90,6 +90,7 @@ std::array<std::unique_ptr<BoostCutParameters>, ParametricEq::NUM_PEAKS> createP
         auto num = juce::String(i + 1);
         auto name = "Peak " + num + " ";
         auto id = "peak" + num;
+        auto freq = static_cast<float>(*std::next(ParametricEq::DEFAULT_FREQS.begin(), static_cast<int>(i)));
 
         Identifier frequencyIdentifier = {id + "Frequency", name + "Frequency", versionHint};
         Identifier qIdentifier = {id + "QFactor", name + "Q-Factor",  versionHint};
@@ -97,7 +98,7 @@ std::array<std::unique_ptr<BoostCutParameters>, ParametricEq::NUM_PEAKS> createP
         Identifier bypassIdentifier = {id + "Bypass", name + "Bypass", versionHint};
         Identifier slopeIdentifier = {id + "Slope", name + "Slope", versionHint};
 
-        auto& frequency = createFrequencyParameter(processor, frequencyIdentifier);
+        auto& frequency = createFrequencyParameter(processor, frequencyIdentifier, freq);
         auto& q = createQParameter(processor, qIdentifier);
         auto& gain = createGainParameter(processor, gainIdentifier);
         auto& slope = createSlopeParameter(processor, slopeIdentifier);
