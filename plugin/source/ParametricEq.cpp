@@ -42,30 +42,36 @@ void ParametricEq::prepareFilters() {
     highPassFilter_.setParametersAndReset(40.0, 1.0);
 }
 
-void ParametricEq::setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb) {
+void ParametricEq::setPeakParameters(size_t bandIndex, 
+    double frequency, double Q, float gainDb, bool isBypassed) {
     if (bandIndex >= peakFilters_.size() || bandIndex < 0) {
         return;
     } else if (bandIndex < peakFilters_.size() && bandIndex >= 0) {
         peakFilters_[bandIndex].setFrequency(frequency);
         peakFilters_[bandIndex].setQ(Q);
         peakFilters_[bandIndex].setAmplitude(gainDb);
+        peakFilters_[bandIndex].setBypassed(isBypassed);
     }
 }
 
-void ParametricEq::setLowShelfParameters(double frequency, double Q, float gainDb) {
+void ParametricEq::setLowShelfParameters(double frequency, double Q, 
+    float gainDb, bool isBypassed) {
     lowShelfFilter_.setFrequency(frequency);
     lowShelfFilter_.setQ(Q);
     lowShelfFilter_.setAmplitude(gainDb);
+    lowShelfFilter_.setBypassed(isBypassed);
 }
 
-void ParametricEq::setLowPassParameters(double frequency, double Q) {
+void ParametricEq::setLowPassParameters(double frequency, double Q, bool isBypassed) {
     lowPassFilter_.setFrequency(frequency);
     lowPassFilter_.setQ(Q);
+    lowPassFilter_.setBypassed(isBypassed);
 }
 
-void ParametricEq::setHighPassParameters(double frequency, double Q) {
+void ParametricEq::setHighPassParameters(double frequency, double Q, bool isBypassed) {
     highPassFilter_.setFrequency(frequency);
     highPassFilter_.setQ(Q);
+    highPassFilter_.setBypassed(isBypassed);
 }
 
 } // namespace parametric_eq

@@ -13,6 +13,9 @@ public:
 
         z1_.assign(static_cast<size_t>(numChannels_), 0.0f);
         z2_.assign(static_cast<size_t>(numChannels_), 0.0f);
+
+        bypassMix_.reset(sampleRate_, 0.005);
+        bypassMix_.setCurrentAndTargetValue(1.0f); 
     }
 
     virtual void reset() {
@@ -30,6 +33,7 @@ public:
 
         for (int n = 0; n < numSamples; ++n) {
             updateSmoothedParameters();
+            float mix = bypassMix_.getNextValue();
 
             for (int ch = 0; ch < numChannels; ++ch) {
                 auto* channelData = buffer.getWritePointer(ch);
@@ -42,9 +46,13 @@ public:
                 z1 = b1_ * x - a1_ * y + z2;
                 z2 = b2_ * x - a2_ * y;
 
-                channelData[n] = y;
+                channelData[n] = x + mix * (y - x);
             }
         }
+    }
+
+    void setBypassed(bool shouldBypass) noexcept {
+        bypassMix_.setTargetValue(shouldBypass ? 0.0f : 1.0f);
     }
 
 protected:
@@ -73,4 +81,6 @@ protected:
 
     std::vector<float> z1_;
     std::vector<float> z2_;
+
+    juce::LinearSmoothedValue<float> bypassMix_{1.0f};
 };

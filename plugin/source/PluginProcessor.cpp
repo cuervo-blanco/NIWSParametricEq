@@ -118,24 +118,31 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
       i, 
       static_cast<double>(peak->base.frequency.get()),
       static_cast<double>(peak->base.qFactor.get()), 
-      peak->gain.get()
+      peak->gain.get(), 
+      peak->base.bypassed.get()
     );
   }
 
+  const auto& lowShelf = parameters_.lowShelfParameters;
   parametricEq_.setLowShelfParameters(
-    static_cast<double>(parameters_.lowShelfParameters.base.frequency.get()),
-    static_cast<double>(parameters_.lowShelfParameters.base.qFactor.get()),
-    parameters_.lowShelfParameters.gain.get()
+    static_cast<double>(lowShelf.base.frequency.get()),
+    static_cast<double>(lowShelf.base.qFactor.get()),
+    lowShelf.gain.get(),
+    lowShelf.base.bypassed.get()
   );
 
+  const auto& lowPass = parameters_.lowPassParameters;
   parametricEq_.setLowPassParameters(
     static_cast<double>(parameters_.lowPassParameters.frequency.get()),
-    static_cast<double>(parameters_.lowPassParameters.qFactor.get())
+    static_cast<double>(parameters_.lowPassParameters.qFactor.get()),
+    lowPass.bypassed.get()
   );
 
+  const auto& highPass = parameters_.lowPassParameters;
   parametricEq_.setHighPassParameters(
     static_cast<double>(parameters_.highPassParameters.frequency.get()),
-    static_cast<double>(parameters_.highPassParameters.qFactor.get())
+    static_cast<double>(parameters_.highPassParameters.qFactor.get()),
+    highPass.bypassed.get()
   );
 
   parametricEq_.processBlock(buffer);

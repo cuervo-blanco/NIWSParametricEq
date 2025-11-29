@@ -20,10 +20,10 @@ public:
 
     void prepareFilters();
 
-    void setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb);
-    void setLowShelfParameters(double frequency, double Q, float gainDb);
-    void setLowPassParameters(double frequency, double Q);
-    void setHighPassParameters(double frequency, double Q);
+    void setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb, bool isBypassed);
+    void setLowShelfParameters(double frequency, double Q, float gainDb, bool isBypassed);
+    void setLowPassParameters(double frequency, double Q, bool isBypassed);
+    void setHighPassParameters(double frequency, double Q, bool isBypassed);
 private:
     std::array<PeakFilter, NUM_PEAKS> peakFilters_;
     LowShelfFilter lowShelfFilter_;
