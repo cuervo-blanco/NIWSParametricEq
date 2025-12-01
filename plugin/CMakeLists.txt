@@ -29,11 +29,12 @@ juce_add_plugin(
 )
 
 set(SOURCE_FILES source/PluginEditor.cpp source/PluginProcessor.cpp
-source/ParametricEq.cpp source/Parameters.cpp)
+source/ParametricEq.cpp source/Parameters.cpp source/SpectrumAnalyzer.cpp)
 
 set(HEADER_FILES ${INCLUDE_DIR}/PluginEditor.h ${INCLUDE_DIR}/PluginProcessor.h
 ${INCLUDE_DIR}/filters/BiquadFilter.h ${INCLUDE_DIR}/filters/PeakFilter.h ${INCLUDE_DIR}/filters/LowShelfFilter.h
-${INCLUDE_DIR}/filters/FilterParameters.h ${INCLUDE_DIR}/ParametricEq.h ${INCLUDE_DIR}/Parameters.h)
+${INCLUDE_DIR}/filters/FilterParameters.h ${INCLUDE_DIR}/ParametricEq.h ${INCLUDE_DIR}/Parameters.h
+${INCLUDE_DIR}/utils/RingBuffer.h ${INCLUDE_DIR}/SpectrumAnalyzer.h)
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES} ${HEADER_FILES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
