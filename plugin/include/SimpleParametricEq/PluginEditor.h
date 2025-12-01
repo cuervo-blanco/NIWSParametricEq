@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PluginProcessor.h"
+#include "FrequencyResponseGUI.h"
 
 namespace parametric_eq {
 class AudioPluginAudioProcessorEditor : public juce::AudioProcessorEditor, private juce::Timer {
@@ -17,6 +18,7 @@ private:
   AudioPluginAudioProcessor& processorRef;
 
   std::vector<float> spectrumMagnitudes_;
+  FrequencyResponseGUI frequencyResponseGUI_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessorEditor)
 };
