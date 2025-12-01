@@ -3,6 +3,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "ParametricEq.h"
 #include "Parameters.h"
+#include "SpectrumAnalyzer.h"
 
 namespace parametric_eq {
 class AudioPluginAudioProcessor : public juce::AudioProcessor {
@@ -38,10 +39,14 @@ public:
   void setStateInformation(const void* data, int sizeInBytes) override;
 
   juce::AudioProcessorParameter* getBypassParameter() const override;
+  SpectrumAnalyzer& getSpectrumAnalyzer() noexcept { return spectrumAnalyzer_; }
+  const SpectrumAnalyzer& getSpectrumAnalyzer() const noexcept { return spectrumAnalyzer_; }
+
 
 private:
   ParametricEq parametricEq_;
   Parameters parameters_{*this};
+  SpectrumAnalyzer spectrumAnalyzer_{11}; 
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessor)
 };

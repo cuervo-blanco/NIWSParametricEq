@@ -75,6 +75,7 @@ void AudioPluginAudioProcessor::prepareToPlay(double sampleRate,
   juce::ignoreUnused(samplesPerBlock);
   auto numChannels = std::min(getTotalNumInputChannels(), getTotalNumOutputChannels());
   parametricEq_.prepare(sampleRate, numChannels);
+  spectrumAnalyzer_.prepare(sampleRate, numChannels);
 }
 
 void AudioPluginAudioProcessor::releaseResources() {
@@ -111,6 +112,8 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
     buffer.clear(i, 0, buffer.getNumSamples());
   }
+
+  spectrumAnalyzer_.pushBlock(buffer);
 
   for (size_t i = 0; i < ParametricEq::NUM_PEAKS; i++) {
     const auto& peak = parameters_.peakFilters[i];
