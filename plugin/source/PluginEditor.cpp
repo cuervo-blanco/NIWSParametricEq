@@ -7,7 +7,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     : AudioProcessorEditor(&p), processorRef(p) {
   juce::ignoreUnused(processorRef);
   setSize(1080, 450);
-  startTimerHz(60);
+  startTimerHz(30);
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor() {}
@@ -24,7 +24,7 @@ void AudioPluginAudioProcessorEditor::paint(juce::Graphics& g) {
     g.setColour(juce::Colours::white);
 
     frequencyResponseGUI_.setBounds(bounds);
-    frequencyResponseGUI_.paint(g, spectrumMagnitudes_, processorRef);
+    frequencyResponseGUI_.paint(g, spectrumMagnitudes_);
 }
 
 void AudioPluginAudioProcessorEditor::resized() {}
