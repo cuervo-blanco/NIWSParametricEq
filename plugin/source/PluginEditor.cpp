@@ -4,39 +4,37 @@
 namespace parametric_eq {
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     AudioPluginAudioProcessor& p)
-    : AudioProcessorEditor(&p), processorRef(p) {
-  juce::ignoreUnused(processorRef);
-  setSize(1080, 450);
-  startTimerHz(30);
+    : AudioProcessorEditor(&p), processorRef(p) 
+{
+    setSize(1080, 450);
+    startTimerHz(30);
+
+    addAndMakeVisible(frequencyResponseGUI_);
+    addAndMakeVisible(frequencyAxis_);
+
+    frequencyAxis_.setInterceptsMouseClicks(false, false);
+    frequencyAxis_.setDbRange(-60.0f, 60.0f);
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor() {}
 
 void AudioPluginAudioProcessorEditor::paint(juce::Graphics& g) {
     g.fillAll(juce::Colour(0,0,0));
-
-    if (spectrumMagnitudes_.empty()) {
-        return;
-    }
-
-    auto bounds = getLocalBounds().toFloat().reduced(10.0f);
-
-    g.setColour(juce::Colours::white);
-
-    frequencyResponseGUI_.setBounds(bounds);
-    frequencyResponseGUI_.paint(g, spectrumMagnitudes_);
 }
 
-void AudioPluginAudioProcessorEditor::resized() {}
+void AudioPluginAudioProcessorEditor::resized() {
+    auto bounds = getLocalBounds().reduced(10); 
+    frequencyResponseGUI_.setBounds(bounds);
+    frequencyAxis_.setBounds(bounds);
+}
 
 void AudioPluginAudioProcessorEditor::timerCallback() {
     auto& analyzer = processorRef.getSpectrumAnalyzer();
 
     if (analyzer.isNewFFTReady()) {
         const auto& mags = analyzer.getMagnitudesDb();
-        spectrumMagnitudes_ = mags;
+        frequencyResponseGUI_.setMagnitudes(mags);
         analyzer.clearNewFFTFlag();
-        repaint();
     }
 }
 

@@ -46,7 +46,7 @@ public:
 private:
   ParametricEq parametricEq_;
   Parameters parameters_{*this};
-  SpectrumAnalyzer spectrumAnalyzer_{11}; 
+  SpectrumAnalyzer spectrumAnalyzer_{12}; 
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessor)
 };

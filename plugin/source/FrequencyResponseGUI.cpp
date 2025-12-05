@@ -1,8 +1,9 @@
 #include "SimpleParametricEq/FrequencyResponseGUI.h"
 
 namespace parametric_eq {
-void FrequencyResponseGUI::paint(juce::Graphics& g,
-                                 const std::vector<float>& magnitudes) {
+void FrequencyResponseGUI::paint(juce::Graphics& g) {
+    const auto& magnitudes = spectrumMagnitudes_;
+
     const auto minFreq = 20.0f;
     const auto maxFreq = 20000.0f;
 
@@ -10,6 +11,8 @@ void FrequencyResponseGUI::paint(juce::Graphics& g,
     if (numBins == 0) {
         return;
     }
+
+    auto bounds = getLocalBounds().toFloat();
 
     const auto internalMinDb = -100.0f;
     const auto internalMaxDb = 60.0f;
@@ -28,9 +31,7 @@ void FrequencyResponseGUI::paint(juce::Graphics& g,
         const auto currentDb  = juce::jlimit(internalMinDb, internalMaxDb, magnitudes[i]);
         const auto previousDb = juce::jlimit(internalMinDb, internalMaxDb, previousMagnitudes_[i]);
 
-        blendedMagnitudes[i] =
-            (1.0f - blend) * currentDb
-          +        blend   * previousDb;
+        blendedMagnitudes[i] = (1.0f - blend) * currentDb + blend * previousDb;
     }
 
     previousMagnitudes_ = magnitudes;
@@ -92,14 +93,13 @@ void FrequencyResponseGUI::paint(juce::Graphics& g,
         }
     }
 
-    {
-        juce::Graphics::ScopedSaveState saveState(g);
+    juce::Graphics::ScopedSaveState saveState(g);
 
-        auto clip = bounds;
-        clip.removeFromBottom(1.0f);
-        g.reduceClipRegion(clip.toNearestInt());
+    auto clip = bounds;
+    clip.removeFromBottom(1.0f);
+    g.reduceClipRegion(clip.toNearestInt());
 
-        g.strokePath(spectrumPath, juce::PathStrokeType(1.5f));
-    }
+    g.setColour(juce::Colours::white);
+    g.strokePath(spectrumPath, juce::PathStrokeType(1.5f));
 }
 }// namespace parametric_eq
