@@ -1,11 +1,9 @@
 #include "SimpleParametricEq/FrequencyResponseGUI.h"
+#include "SimpleParametricEq/gui/FrequencyMapping.h"
 
 namespace parametric_eq {
 void FrequencyResponseGUI::paint(juce::Graphics& g) {
     const auto& magnitudes = spectrumMagnitudes_;
-
-    const auto minFreq = 20.0f;
-    const auto maxFreq = 20000.0f;
 
     const auto numBins = static_cast<int>(magnitudes.size());
     if (numBins == 0) {
@@ -14,11 +12,14 @@ void FrequencyResponseGUI::paint(juce::Graphics& g) {
 
     auto bounds = getLocalBounds().toFloat();
 
-    const auto internalMinDb = -100.0f;
-    const auto internalMaxDb = 60.0f;
+    const auto internalMinDb = -200.0f;
+    const auto internalMaxDb = 200.0f;
 
-    const auto visibleMinDb = -20.0f;
-    const auto visibleMaxDb = 60.0f;
+    const auto visibleHeadroom = 40.0f;
+    const auto visibleMinDb = -visibleHeadroom;
+    const auto visibleMaxDb = visibleHeadroom;
+
+    const auto referenceDb = 60.0f;
 
     if (previousMagnitudes_.size() != magnitudes.size()) {
         previousMagnitudes_ = magnitudes;
@@ -59,28 +60,27 @@ void FrequencyResponseGUI::paint(juce::Graphics& g) {
     juce::Path spectrumPath;
     bool pathStarted = false;
 
+    const auto nyquist = static_cast<float>(sampleRate_ * 0.5);
+
     for (int bin = 0; bin < numBins; ++bin) {
         auto freq = juce::jmap(static_cast<float>(bin),
                                0.0f,
                                static_cast<float>(numBins - 1),
                                0.0f,
-                               maxFreq);
+                               nyquist);
 
-        freq = std::max(freq, minFreq);
-
-        if (freq > maxFreq) {
+        if (freq < freqmap::minFreq || freq > freqmap::maxFreq) {
             continue;
         }
 
-        auto normX = (std::log10(freq) - std::log10(minFreq)) /
-            (std::log10(maxFreq) - std::log10(minFreq));
-
-        auto x = juce::jmap(normX, bounds.getX(), bounds.getRight());
+        auto x = freqmap::frequencyToX(freq, bounds);
 
         auto rawDb = displayMagnitudes[static_cast<size_t>(bin)];
         rawDb = juce::jlimit(internalMinDb, internalMaxDb, rawDb);
 
-        float dbForY = juce::jlimit(visibleMinDb, visibleMaxDb, rawDb);
+        const auto calibratedDb = rawDb - referenceDb;
+
+        auto dbForY = juce::jlimit(visibleMinDb, visibleMaxDb, calibratedDb);
 
         auto normY = juce::jmap(dbForY, visibleMinDb, visibleMaxDb, 1.0f, 0.0f);
         auto y = juce::jmap(normY, 0.0f, 1.0f, bounds.getY(), bounds.getBottom());

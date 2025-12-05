@@ -1,5 +1,7 @@
 #include "SimpleParametricEq/gui/FrequencyAxis.h"
+#include "SimpleParametricEq/gui/FrequencyMapping.h"
 
+namespace parametric_eq {
 void FrequencyAxis::paint (juce::Graphics& g) {
     auto bounds = getLocalBounds().toFloat();
 
@@ -8,8 +10,8 @@ void FrequencyAxis::paint (juce::Graphics& g) {
     g.setColour (juce::Colours::transparentBlack);
     g.fillAll();
 
-    g.setColour (juce::Colours::white);
-    g.setFont (fontOptions);
+    g.setColour(juce::Colours::white);
+    g.setFont(fontOptions);
 
     static constexpr std::array<float, 13> freqTicks {
         20.0f, 30.0f, 40.0f, 50.0f,
@@ -22,7 +24,7 @@ void FrequencyAxis::paint (juce::Graphics& g) {
     const float bottom = bounds.getBottom();
 
     for (auto freq : freqTicks) {
-        const float x = frequencyToX(freq, bounds);
+        const float x = freqmap::frequencyToX(freq, bounds);
 
         const bool isDecade = (std::fmod(std::log10(freq), 1.0f) == 0.0f);
         const float thickness = isDecade ? 1.5f : 0.7f;
@@ -59,3 +61,4 @@ void FrequencyAxis::paint (juce::Graphics& g) {
                      juce::Justification::left,
                      1);
 }
+}  // namespace parametric_eq

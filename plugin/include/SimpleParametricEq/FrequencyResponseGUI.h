@@ -14,9 +14,15 @@ public:
         repaint();
     }
 
+    void setSampleRate(double sampleRate) noexcept {
+        sampleRate_ = sampleRate;
+    }
+
 private:
     std::vector<float> spectrumMagnitudes_; 
     std::vector<float> previousMagnitudes_;
+
+    double sampleRate_{44100.0};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FrequencyResponseGUI)
 };

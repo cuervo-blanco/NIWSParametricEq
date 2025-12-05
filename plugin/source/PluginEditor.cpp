@@ -13,7 +13,10 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     addAndMakeVisible(frequencyAxis_);
 
     frequencyAxis_.setInterceptsMouseClicks(false, false);
-    frequencyAxis_.setDbRange(-60.0f, 60.0f);
+    frequencyAxis_.setDbRange(-40.0f, 40.0f);
+
+    frequencyResponseGUI_.setInterceptsMouseClicks(false, false);
+    frequencyResponseGUI_.setSampleRate(processorRef.getSampleRate());
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor() {}
