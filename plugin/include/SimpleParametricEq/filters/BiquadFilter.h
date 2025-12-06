@@ -52,22 +52,25 @@ public:
     }
 
     void setParametersAndReset(double frequency, double Q, float amplitude = 0.0f) {
-        frequency_ = frequency;
+        freqRaw_ = frequency;
         QRaw_ = Q;
         gainDbRaw_ = amplitude;
 
         qSmoothed_.reset(sampleRate_, 0.02); 
         gainSmoothed_.reset(sampleRate_, 0.01);
+        freqSmoothed_.reset(sampleRate_, 0.01);
 
         qSmoothed_.setCurrentAndTargetValue(static_cast<float>(QRaw_));
+        freqSmoothed_.setCurrentAndTargetValue(static_cast<float>(freqRaw_));
 
-        const float initA = std::pow(10.0f, gainDbRaw_ / 20.0f);
+        const auto initA = std::pow(10.0f, gainDbRaw_ / 20.0f);
         gainSmoothed_.setCurrentAndTargetValue(initA);
 
         lastQ_ = qSmoothed_.getCurrentValue();
         lastA_ = gainSmoothed_.getCurrentValue();
+        lastFreq_ = freqSmoothed_.getCurrentValue();
 
-        calculateAndSetCoefficients(lastQ_, lastA_);
+        calculateAndSetCoefficients(lastQ_, lastA_, lastFreq_);
 
         reset();
     }
@@ -77,7 +80,8 @@ public:
     }
 
     void setFrequency(double frequency) {
-        frequency_ = frequency;
+        freqRaw_ = frequency;
+        freqSmoothed_.setTargetValue(static_cast<float>(freqRaw_));
         coeffsDirty_ = true;
     }
 
@@ -127,7 +131,7 @@ public:
 protected:
     static constexpr float EPSILON = 1e-3f;
 
-    double frequency_{1000.0};
+    double freqRaw_{1000.0};
     double QRaw_{1.0};
     float gainDbRaw_{0.0f};
 
@@ -156,18 +160,21 @@ protected:
     juce::LinearSmoothedValue<float> bypassMix_{1.0f};
     juce::SmoothedValue<float> qSmoothed_;
     juce::SmoothedValue<float> gainSmoothed_;
+    juce::SmoothedValue<float> freqSmoothed_;
 
     float lastQ_{1.0f};
     float lastA_{1.0f};
+    float lastFreq_{1000.0f};
 
     bool coeffsDirty_{true};
 
-    virtual void calculateAndSetCoefficients(float Q, float amplitude) = 0;
+    virtual void calculateAndSetCoefficients(float Q, float amplitude, float frequency) = 0;
 
     void updateSmoothedParameters() {
         if (coeffsDirty_) {
             calculateAndSetCoefficients(qSmoothed_.getCurrentValue(),
-                                        gainSmoothed_.getCurrentValue());
+                                        gainSmoothed_.getCurrentValue(),
+                                        freqSmoothed_.getCurrentValue());
             lastQ_ = qSmoothed_.getCurrentValue();
             lastA_ = gainSmoothed_.getCurrentValue();
             coeffsDirty_ = false;
@@ -176,14 +183,17 @@ protected:
 
         const auto qNow = qSmoothed_.getNextValue();
         const auto aNow = gainSmoothed_.getNextValue();
+        const auto freqNow = freqSmoothed_.getNextValue();
 
         const auto qDiff = std::abs(qNow - lastQ_);
         const auto aDiff = std::abs(aNow - lastA_);
+        const auto freqDiff = std::abs(freqNow - lastFreq_);
 
-        if (qDiff > EPSILON || aDiff > EPSILON) {
-            calculateAndSetCoefficients(qNow, aNow);
+        if (qDiff > EPSILON || aDiff > EPSILON || freqDiff > EPSILON) {
+            calculateAndSetCoefficients(qNow, aNow, freqNow);
             lastQ_ = qNow;
             lastA_ = aNow;
+            lastFreq_ = freqNow;
         }
     }
 };

@@ -6,10 +6,11 @@ public:
     BandPassFilter() = default;
     ~BandPassFilter() override = default;
 private:
-    void calculateAndSetCoefficients(float Q, float amplitude) override {
+    void calculateAndSetCoefficients(float Q, float amplitude, float frequency) override {
         juce::ignoreUnused(amplitude);
 
-        const auto w0 = static_cast<float>(2.0 * M_PI * frequency_ / sampleRate_);
+        const auto sampleRate = static_cast<float>(sampleRate_);
+        const auto w0 = 2.0f * static_cast<float>(M_PI) * frequency / sampleRate;
         const auto cos_w = static_cast<float>(std::cos(w0));
         const auto alpha = std::sin(w0) / (2.0f * Q);
 
