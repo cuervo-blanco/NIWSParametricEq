@@ -32,7 +32,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor() {}
 
 void AudioPluginAudioProcessorEditor::paint(juce::Graphics& g) {
-    g.fillAll(juce::Colour(0,0,0));
+    g.fillAll(juce::Colour(0,50,94));
 }
 
 void AudioPluginAudioProcessorEditor::resized() {

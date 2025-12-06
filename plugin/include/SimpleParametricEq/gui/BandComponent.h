@@ -97,13 +97,13 @@ public:
         auto centre = getHandlePosition(bounds);
         const auto radius = 6.0f;
 
-        g.setColour(juce::Colours::black.withAlpha(0.5f));
+        g.setColour(juce::Colours::white);
         g.fillEllipse(centre.x - (radius + 1.0f),
                       centre.y - (radius + 1.0f),
                       2.0f * (radius + 1.0f),
                       2.0f * (radius + 1.0f));
 
-        g.setColour(juce::Colours::orange);
+        g.setColour(juce::Colour(222,140,0));
         g.fillEllipse(centre.x - radius,
                       centre.y - radius,
                       2.0f * radius,
