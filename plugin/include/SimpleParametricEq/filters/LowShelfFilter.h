@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FilterParameters.h"
-class LowShelfFilter : public FilterParameters {
+class LowShelfFilter : public BiquadFilter {
 public:
     LowShelfFilter() = default;
     ~LowShelfFilter() override = default;

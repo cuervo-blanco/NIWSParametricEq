@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FilterParameters.h"
-class HighShelfFilter : public FilterParameters {
+class HighShelfFilter : public BiquadFilter {
 public:
     HighShelfFilter() = default;
     ~HighShelfFilter() override = default;

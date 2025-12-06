@@ -2,7 +2,7 @@
 
 #include "FilterParameters.h"
 
-class NotchFilter : public FilterParameters {
+class NotchFilter : public BiquadFilter {
 public:
     NotchFilter() = default;
     ~NotchFilter() override = default;

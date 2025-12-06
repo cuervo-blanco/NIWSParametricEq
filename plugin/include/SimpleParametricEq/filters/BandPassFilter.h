@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FilterParameters.h"
-class BandPassFilter : public FilterParameters {
+class BandPassFilter : public BiquadFilter {
 public:
     BandPassFilter() = default;
     ~BandPassFilter() override = default;

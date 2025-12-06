@@ -2,7 +2,7 @@
 
 #include "FilterParameters.h"
 
-class PeakFilter : public FilterParameters {
+class PeakFilter : public BiquadFilter {
 public:
     PeakFilter() = default;
     ~PeakFilter() override = default;

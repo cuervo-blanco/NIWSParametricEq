@@ -18,7 +18,7 @@ void SpectrumAnalyzer::pushBlock(const juce::AudioBuffer<float>& buffer) {
     ringBuffer_.writeBlock(buffer);
 
     samplesSinceLastFFT_ += buffer.getNumSamples();
-    const auto hopSize = static_cast<int>(fftSize_ / 2);
+    const auto hopSize = static_cast<int>(fftSize_);
 
     while (samplesSinceLastFFT_ >= hopSize) {
         performFFT();

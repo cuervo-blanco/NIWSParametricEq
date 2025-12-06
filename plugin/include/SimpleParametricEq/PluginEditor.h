@@ -3,7 +3,6 @@
 #include "PluginProcessor.h"
 #include "FrequencyResponseGUI.h"
 #include "gui/FrequencyAxis.h"
-
 namespace parametric_eq {
 class AudioPluginAudioProcessorEditor : public juce::AudioProcessorEditor, private juce::Timer {
 public:
@@ -17,7 +16,6 @@ private:
   void timerCallback() override;
 
   AudioPluginAudioProcessor& processorRef;
-
   FrequencyAxis frequencyAxis_;
   FrequencyResponseGUI frequencyResponseGUI_;
 

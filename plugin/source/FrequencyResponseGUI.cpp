@@ -11,10 +11,10 @@ void FrequencyResponseGUI::paint(juce::Graphics& g) {
     auto bounds = getLocalBounds().toFloat();
 
     const auto visibleHeadroomDb = 40.0f;
-    const auto referenceDb = 30.0f;
+    const auto referenceDb = 60.0f;
 
     if (previousMagnitudes_.empty() || previousMagnitudes_.size() != spectrumMagnitudes_.size()) {
-        previousMagnitudes_ = spectruMagnitudes_;
+        previousMagnitudes_ = spectrumMagnitudes_;
     }
 
     std::vector<float> blendedMagnitudes(spectrumMagnitudes_.size());
@@ -30,23 +30,7 @@ void FrequencyResponseGUI::paint(juce::Graphics& g) {
 
     std::vector<float> displayMagnitudes(blendedMagnitudes.size());
 
-    if (blendedMagnitudes.size() >= 3) {
-        displayMagnitudes[0] =
-            0.5f * (blendedMagnitudes[0] + blendedMagnitudes[1]);
-
-        for (size_t i = 1; i < blendedMagnitudes.size() - 1; ++i) {
-            displayMagnitudes[i] =
-                (blendedMagnitudes[i - 1]
-               + blendedMagnitudes[i]
-               + blendedMagnitudes[i + 1]) / 3.0f;
-        }
-
-        const auto last = blendedMagnitudes.size() - 1;
-        displayMagnitudes[last] =
-            0.5f * (blendedMagnitudes[last - 1] + blendedMagnitudes[last]);
-    } else {
-        displayMagnitudes = blendedMagnitudes;
-    }
+    displayMagnitudes = blendedMagnitudes;
 
     juce::Path spectrumPath;
     bool pathStarted = false;

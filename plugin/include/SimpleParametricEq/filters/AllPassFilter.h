@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FilterParameters.h"
-class AllPassFilter : public FilterParameters {
+class AllPassFilter : public BiquadFilter {
 public:
     AllPassFilter() = default;
     ~AllPassFilter() override = default;
