@@ -92,6 +92,38 @@ public:
         gainSmoothed_.setTargetValue(A);
     }
 
+    float getMagnitudeAtFrequency(double freq) const {
+        if (sampleRate_ <= 0.0) {
+            return 1.0f;
+        }
+
+        const auto ω = 2.0 * juce::MathConstants<double>::pi * freq / sampleRate_;
+        const auto cos1 = std::cos(ω);
+        const auto sin1 = std::sin(ω);
+        const auto cos2 = std::cos(2.0 * ω);
+        const auto sin2 = std::sin(2.0 * ω);
+
+        const auto numReal = b0_ + b1_ * cos1 + b2_ * cos2;
+        const auto numImag = -b1_ * sin1 - b2_ * sin2;
+
+        const auto denReal = a0_ + a1_ * cos1 + a2_ * cos2;
+        const auto denImag = -a1_ * sin1 - a2_ * sin2;
+
+        const auto numMag2 = numReal * numReal + numImag * numImag;
+        const auto denMag2 = denReal * denReal + denImag * denImag;
+
+        if (denMag2 <= 0.0) {
+            return 1.0f;
+        }
+
+        const auto mag = std::sqrt(numMag2 / denMag2);
+        return static_cast<float>(mag);
+    }
+
+    float getMagnitudeDbAt (double frequencyHz) const noexcept {
+        return juce::Decibels::gainToDecibels(getMagnitudeAtFrequency(frequencyHz));
+    }
+
 protected:
     static constexpr float EPSILON = 1e-3f;
 
