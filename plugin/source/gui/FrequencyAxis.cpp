@@ -1,16 +1,29 @@
 #include "SimpleParametricEq/gui/FrequencyAxis.h"
 #include "SimpleParametricEq/gui/FrequencyMapping.h"
+#include "SimpleParametricEq/filters/BiquadFilter.h"
 
 namespace parametric_eq {
-void FrequencyAxis::paint (juce::Graphics& g) {
+void FrequencyAxis::paint(juce::Graphics& g) {
     auto bounds = getLocalBounds().toFloat();
 
+    g.fillAll(juce::Colours::transparentBlack);
+
+    drawGrid(g, bounds);
+    drawZeroLine(g, bounds);
+
+    if (!referenceBands_.empty()) {
+        drawResponse(g, bounds, referenceBands_,
+                     juce::Colours::darkgrey, 1.5f, 0.7f);
+    }
+
+    if (!bands_.empty()) {
+        drawResponse(g, bounds, bands_,
+                     juce::Colours::orange, 2.0f, 1.0f);
+    }
+}
+
+void FrequencyAxis::drawGrid (juce::Graphics& g, juce::Rectangle<float> bounds) {
     juce::FontOptions fontOptions(12.0f);
-
-    g.setColour (juce::Colours::transparentBlack);
-    g.fillAll();
-
-    g.setColour(juce::Colours::white);
     g.setFont(fontOptions);
 
     static constexpr std::array<float, 13> freqTicks {
@@ -20,13 +33,13 @@ void FrequencyAxis::paint (juce::Graphics& g) {
         10000.0f, 15000.0f, 20000.0f
     };
 
-    const float top = bounds.getY();
+    const float top    = bounds.getY();
     const float bottom = bounds.getBottom();
 
     for (auto freq : freqTicks) {
         const float x = freqmap::frequencyToX(freq, bounds);
 
-        const bool isDecade = (std::fmod(std::log10(freq), 1.0f) == 0.0f);
+        const bool isDecade   = (std::fmod(std::log10(freq), 1.0f) == 0.0f);
         const float thickness = isDecade ? 1.5f : 0.7f;
 
         g.setColour(juce::Colours::darkgrey.withAlpha(0.7f));
@@ -34,8 +47,8 @@ void FrequencyAxis::paint (juce::Graphics& g) {
 
         if (freq >= 100.0f) {
             juce::String label = (freq >= 1000.0f)
-                ? juce::String(freq / 1000.0f, 1) + "k"
-                : juce::String(static_cast<int>(freq));
+                                   ? juce::String(freq / 1000.0f, 1) + "k"
+                                   : juce::String(static_cast<int>(freq));
 
             g.setColour(juce::Colours::white.withAlpha(0.9f));
 
@@ -46,10 +59,12 @@ void FrequencyAxis::paint (juce::Graphics& g) {
                              1);
         }
     }
+}
 
+void FrequencyAxis::drawZeroLine (juce::Graphics& g, juce::Rectangle<float> bounds) {
     const float zeroNorm = juce::jmap(0.0f, minDb_, maxDb_, 1.0f, 0.0f);
     const float zeroY = juce::jmap(zeroNorm, 0.0f, 1.0f,
-                                   bounds.getY(), bounds.getBottom());
+                                      bounds.getY(), bounds.getBottom());
 
     g.setColour(juce::Colours::orange.withAlpha(0.9f));
     g.drawLine(bounds.getX(), zeroY, bounds.getRight(), zeroY, 1.5f);
@@ -61,4 +76,66 @@ void FrequencyAxis::paint (juce::Graphics& g) {
                      juce::Justification::left,
                      1);
 }
+
+void FrequencyAxis::drawResponse (juce::Graphics& g,
+                                  juce::Rectangle<float> bounds,
+                                  const std::vector<BiquadFilter*>& bands,
+                                  juce::Colour colour,
+                                  float thickness,
+                                  float alpha)
+{
+    if (bands.empty())
+        return;
+
+    static constexpr int numPoints = 512;
+
+    juce::Path path;
+    bool started = false;
+
+    const double minFreq = 20.0;
+    const double maxFreq = 20000.0;
+    const double logMin  = std::log10(minFreq);
+    const double logMax  = std::log10(maxFreq);
+
+    for (int i = 0; i < numPoints; ++i) {
+        const double t       = static_cast<double>(i) / (numPoints - 1);
+        const double logF    = juce::jmap(t,  logMin, logMax);
+        const double freq    = std::pow(10.0, logF);
+
+        const float magDb    = getCombinedMagnitudeDbAt(freq, bands);
+
+        const float clampedDb = juce::jlimit(minDb_, maxDb_, magDb);
+
+        const float x = freqmap::frequencyToX(static_cast<float>(freq), bounds);
+
+        const float yNorm = juce::jmap(clampedDb, minDb_, maxDb_, 1.0f, 0.0f);
+        const float y = juce::jmap(yNorm, 0.0f, 1.0f,
+                                       bounds.getY(), bounds.getBottom());
+
+        if (!started) {
+            path.startNewSubPath(x, y);
+            started = true;
+        } else {
+            path.lineTo(x, y);
+        }
+    }
+
+    g.setColour(colour.withAlpha(alpha));
+    g.strokePath(path, juce::PathStrokeType(thickness));
+}
+
+
+float FrequencyAxis::getCombinedMagnitudeDbAt(double freqHz,
+                                       const std::vector<BiquadFilter*>& bands) {
+    auto totalGain = 1.0;
+
+    for (auto* b : bands) {
+        if (b != nullptr) {
+            totalGain *= static_cast<double>(b->getMagnitudeAtFrequency(freqHz));
+        }
+    }
+
+    return juce::Decibels::gainToDecibels(static_cast<float>(totalGain));
+}
+
 }  // namespace parametric_eq

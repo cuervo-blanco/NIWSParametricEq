@@ -42,6 +42,11 @@ public:
   SpectrumAnalyzer& getSpectrumAnalyzer() noexcept { return spectrumAnalyzer_; }
   const SpectrumAnalyzer& getSpectrumAnalyzer() const noexcept { return spectrumAnalyzer_; }
 
+  Parameters& getParameters() noexcept { return parameters_; }
+  const Parameters& getParameters() const noexcept { return parameters_; }
+
+  ParametricEq& getParametricEq() noexcept { return parametricEq_; }
+  const ParametricEq& getParametricEq() const noexcept { return parametricEq_; }
 
 private:
   ParametricEq parametricEq_;

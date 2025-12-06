@@ -4,6 +4,7 @@
 #include "SimpleParametricEq/filters/LowShelfFilter.h"
 #include "SimpleParametricEq/filters/LowPassFilter.h"
 #include "SimpleParametricEq/filters/HighPassFilter.h"
+#include "filters/BiquadFilter.h"
 
 namespace parametric_eq {
 class ParametricEq {
@@ -25,6 +26,9 @@ public:
     void setLowShelfParameters(double frequency, double Q, float gainDb, bool isBypassed);
     void setLowPassParameters(double frequency, double Q, bool isBypassed);
     void setHighPassParameters(double frequency, double Q, bool isBypassed);
+
+    std::vector<BiquadFilter*> getBands() noexcept;
+    BiquadFilter& getPeakFilter(size_t index);
 private:
     std::array<PeakFilter, NUM_PEAKS> peakFilters_;
     LowShelfFilter lowShelfFilter_;

@@ -83,4 +83,24 @@ void ParametricEq::setHighPassParameters(double frequency, double Q, bool isBypa
     highPassFilter_.setBypassed(isBypassed);
 }
 
+std::vector<BiquadFilter*> ParametricEq::getBands() noexcept {
+    std::vector<BiquadFilter*> result;
+    result.reserve(NUM_PEAKS + 3);
+
+    for (auto& p : peakFilters_) {
+        result.push_back(&p);
+    }
+
+    result.push_back(&lowShelfFilter_);
+    result.push_back(&lowPassFilter_);
+    result.push_back(&highPassFilter_);
+
+    return result;
+}
+
+BiquadFilter& ParametricEq::getPeakFilter(size_t index) {
+    jassert(index < NUM_PEAKS);
+    return peakFilters_[index];
+}
+
 } // namespace parametric_eq

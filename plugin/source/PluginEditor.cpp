@@ -1,22 +1,32 @@
 #include "SimpleParametricEq/PluginEditor.h"
 #include "SimpleParametricEq/PluginProcessor.h"
+#include "SimpleParametricEq/ParametricEq.h"
+#include "SimpleParametricEq/Parameters.h"
 
 namespace parametric_eq {
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     AudioPluginAudioProcessor& p)
-    : AudioProcessorEditor(&p), processorRef(p) 
+    : AudioProcessorEditor(&p), processorRef(p),
+    peakBand0_ (processorRef.getParameters().peakFilters[0]->base.frequency,
+                processorRef.getParameters().peakFilters[0]->gain,
+                frequencyAxis_,
+                BandComponent::BandType::Peak)
 {
     setSize(1080, 450);
     startTimerHz(30);
 
     addAndMakeVisible(frequencyResponseGUI_);
     addAndMakeVisible(frequencyAxis_);
+    addAndMakeVisible(peakBand0_);
 
     frequencyAxis_.setInterceptsMouseClicks(false, false);
     frequencyAxis_.setDbRange(-40.0f, 40.0f);
 
     frequencyResponseGUI_.setInterceptsMouseClicks(false, false);
     frequencyResponseGUI_.setSampleRate(processorRef.getSampleRate());
+
+    peakBand0_.setDbRange(-40.0f, 40.0f);
+    peakBand0_.updateFromParameters();
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor() {}
@@ -29,6 +39,7 @@ void AudioPluginAudioProcessorEditor::resized() {
     auto bounds = getLocalBounds().reduced(10); 
     frequencyResponseGUI_.setBounds(bounds);
     frequencyAxis_.setBounds(bounds);
+    peakBand0_.setBounds(bounds);
 }
 
 void AudioPluginAudioProcessorEditor::timerCallback() {
@@ -39,6 +50,8 @@ void AudioPluginAudioProcessorEditor::timerCallback() {
         frequencyResponseGUI_.setMagnitudes(mags);
         analyzer.clearNewFFTFlag();
     }
+
+    peakBand0_.updateFromParameters();
 }
 
 }  // namespace parametric_eq
