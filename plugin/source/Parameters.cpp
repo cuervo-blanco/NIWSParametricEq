@@ -148,9 +148,10 @@ BaseParameters createHighPassParameters(juce::AudioProcessor& processor) {
 } // namespace
 
 Parameters::Parameters(juce::AudioProcessor& processor)
-      : bypassed(createBypassedParameter(processor, {"bypassed", "Bypass", 1})),
+      : bypassed{createBypassedParameter(processor, {"bypassed", "Bypass", 1})},
       peakFilters{createPeakFilterParameters(processor)},
       lowShelfParameters{createLowShelfParameters(processor)},  
       lowPassParameters{createLowPassParameters(processor)},
-      highPassParameters{createHighPassParameters(processor)} {}
+      highPassParameters{createHighPassParameters(processor)},
+      isPost{createBypassedParameter(processor, {"isPost", "Post", 1})} {}
 }  // namespace parametric_eq

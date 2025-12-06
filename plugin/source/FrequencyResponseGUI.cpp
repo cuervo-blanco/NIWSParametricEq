@@ -3,39 +3,30 @@
 
 namespace parametric_eq {
 void FrequencyResponseGUI::paint(juce::Graphics& g) {
-    const auto& magnitudes = spectrumMagnitudes_;
-
-    const auto numBins = static_cast<int>(magnitudes.size());
+    const auto numBins = static_cast<int>(spectrumMagnitudes_.size());
     if (numBins == 0) {
         return;
     }
 
     auto bounds = getLocalBounds().toFloat();
 
-    const auto internalMinDb = -200.0f;
-    const auto internalMaxDb = 200.0f;
+    const auto visibleHeadroomDb = 40.0f;
+    const auto referenceDb = 30.0f;
 
-    const auto visibleHeadroom = 40.0f;
-    const auto visibleMinDb = -visibleHeadroom;
-    const auto visibleMaxDb = visibleHeadroom;
-
-    const auto referenceDb = 60.0f;
-
-    if (previousMagnitudes_.size() != magnitudes.size()) {
-        previousMagnitudes_ = magnitudes;
+    if (previousMagnitudes_.empty() || previousMagnitudes_.size() != spectrumMagnitudes_.size()) {
+        previousMagnitudes_ = spectruMagnitudes_;
     }
 
-    std::vector<float> blendedMagnitudes(magnitudes.size());
+    std::vector<float> blendedMagnitudes(spectrumMagnitudes_.size());
     const auto blend = 0.5f;
 
-    for (size_t i = 0; i < magnitudes.size(); ++i) {
-        const auto currentDb  = juce::jlimit(internalMinDb, internalMaxDb, magnitudes[i]);
-        const auto previousDb = juce::jlimit(internalMinDb, internalMaxDb, previousMagnitudes_[i]);
-
+    for (size_t i = 0; i < spectrumMagnitudes_.size(); ++i) {
+        const auto currentDb = spectrumMagnitudes_[i];
+        const auto previousDb = previousMagnitudes_[i];
         blendedMagnitudes[i] = (1.0f - blend) * currentDb + blend * previousDb;
     }
 
-    previousMagnitudes_ = magnitudes;
+    previousMagnitudes_ = spectrumMagnitudes_;
 
     std::vector<float> displayMagnitudes(blendedMagnitudes.size());
 
@@ -76,13 +67,12 @@ void FrequencyResponseGUI::paint(juce::Graphics& g) {
         auto x = freqmap::frequencyToX(freq, bounds);
 
         auto rawDb = displayMagnitudes[static_cast<size_t>(bin)];
-        rawDb = juce::jlimit(internalMinDb, internalMaxDb, rawDb);
 
         const auto calibratedDb = rawDb - referenceDb;
 
-        auto dbForY = juce::jlimit(visibleMinDb, visibleMaxDb, calibratedDb);
+        auto dbForY = juce::jlimit(-visibleHeadroomDb, visibleHeadroomDb, calibratedDb);
 
-        auto normY = juce::jmap(dbForY, visibleMinDb, visibleMaxDb, 1.0f, 0.0f);
+        auto normY = juce::jmap(dbForY, -visibleHeadroomDb, visibleHeadroomDb, 1.0f, 0.0f);
         auto y = juce::jmap(normY, 0.0f, 1.0f, bounds.getY(), bounds.getBottom());
 
         if (!pathStarted) {

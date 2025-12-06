@@ -15,6 +15,8 @@ struct Parameters {
     BoostCutParameters lowShelfParameters; 
     BaseParameters lowPassParameters;
     BaseParameters highPassParameters;
+    
+    juce::AudioParameterBool& isPost;
 
     JUCE_DECLARE_NON_COPYABLE(Parameters)
     JUCE_DECLARE_NON_MOVEABLE(Parameters)
