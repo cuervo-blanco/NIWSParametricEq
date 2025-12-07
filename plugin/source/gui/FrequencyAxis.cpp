@@ -22,7 +22,7 @@ void FrequencyAxis::paint(juce::Graphics& g) {
     }
 }
 
-void FrequencyAxis::drawGrid (juce::Graphics& g, juce::Rectangle<float> bounds) {
+void FrequencyAxis::drawGrid(juce::Graphics& g, juce::Rectangle<float> bounds) {
     juce::FontOptions fontOptions(12.0f);
     g.setFont(fontOptions);
 
@@ -33,14 +33,14 @@ void FrequencyAxis::drawGrid (juce::Graphics& g, juce::Rectangle<float> bounds) 
         10000.0f, 15000.0f, 20000.0f
     };
 
-    const float top    = bounds.getY();
-    const float bottom = bounds.getBottom();
+    const auto top = bounds.getY();
+    const auto bottom = bounds.getBottom();
 
     for (auto freq : freqTicks) {
-        const float x = freqmap::frequencyToX(freq, bounds);
+        const auto x = freqmap::frequencyToX(freq, bounds);
 
-        const bool isDecade   = (std::fmod(std::log10(freq), 1.0f) == 0.0f);
-        const float thickness = isDecade ? 1.5f : 0.7f;
+        const auto isDecade = (std::fmod(std::log10(freq), 1.0f) == 0.0f);
+        const auto thickness = isDecade ? 1.5f : 0.7f;
 
         g.setColour(juce::Colours::darkgrey.withAlpha(0.7f));
         g.drawLine(x, top, x, bottom, thickness);
@@ -61,9 +61,9 @@ void FrequencyAxis::drawGrid (juce::Graphics& g, juce::Rectangle<float> bounds) 
     }
 }
 
-void FrequencyAxis::drawZeroLine (juce::Graphics& g, juce::Rectangle<float> bounds) {
-    const float zeroNorm = juce::jmap(0.0f, minDb_, maxDb_, 1.0f, 0.0f);
-    const float zeroY = juce::jmap(zeroNorm, 0.0f, 1.0f,
+void FrequencyAxis::drawZeroLine(juce::Graphics& g, juce::Rectangle<float> bounds) {
+    const auto zeroNorm = juce::jmap(0.0f, minDb_, maxDb_, 1.0f, 0.0f);
+    const auto zeroY = juce::jmap(zeroNorm, 0.0f, 1.0f,
                                       bounds.getY(), bounds.getBottom());
 
     g.setColour(juce::Colours::orange.withAlpha(0.9f));
@@ -77,40 +77,40 @@ void FrequencyAxis::drawZeroLine (juce::Graphics& g, juce::Rectangle<float> boun
                      1);
 }
 
-void FrequencyAxis::drawResponse (juce::Graphics& g,
-                                  juce::Rectangle<float> bounds,
-                                  const std::vector<BiquadFilter*>& bands,
-                                  juce::Colour colour,
-                                  float thickness,
-                                  float alpha)
-{
-    if (bands.empty())
+void FrequencyAxis::drawResponse(juce::Graphics& g,
+                                 juce::Rectangle<float> bounds,
+                                 const std::vector<BiquadFilter*>& bands,
+                                 juce::Colour colour,
+                                 float thickness,
+                                 float alpha) {
+    if (bands.empty()) {
         return;
+    }
 
-    static constexpr int numPoints = 512;
+    static constexpr auto numPoints = 512;
 
     juce::Path path;
     bool started = false;
 
-    const double minFreq = 20.0;
-    const double maxFreq = 20000.0;
+    const auto minFreq = 20.0;
+    const auto maxFreq = 20000.0;
     const double logMin  = std::log10(minFreq);
     const double logMax  = std::log10(maxFreq);
 
     for (int i = 0; i < numPoints; ++i) {
-        const double t       = static_cast<double>(i) / (numPoints - 1);
-        const double logF    = juce::jmap(t,  logMin, logMax);
-        const double freq    = std::pow(10.0, logF);
+        const auto t = static_cast<double>(i) / (numPoints - 1);
+        const auto logF = juce::jmap(t,  logMin, logMax);
+        const double freq = std::pow(10.0, logF);
 
-        const float magDb    = getCombinedMagnitudeDbAt(freq, bands);
+        const auto magDb = getCombinedMagnitudeDbAt(freq, bands);
 
-        const float clampedDb = juce::jlimit(minDb_, maxDb_, magDb);
+        const auto clampedDb = juce::jlimit(minDb_, maxDb_, magDb);
 
-        const float x = freqmap::frequencyToX(static_cast<float>(freq), bounds);
+        const auto x = freqmap::frequencyToX(static_cast<float>(freq), bounds);
 
-        const float yNorm = juce::jmap(clampedDb, minDb_, maxDb_, 1.0f, 0.0f);
-        const float y = juce::jmap(yNorm, 0.0f, 1.0f,
-                                       bounds.getY(), bounds.getBottom());
+        const auto yNorm = juce::jmap(clampedDb, minDb_, maxDb_, 1.0f, 0.0f);
+        const auto y = juce::jmap(yNorm, 0.0f, 1.0f,
+                                  bounds.getY(), bounds.getBottom());
 
         if (!started) {
             path.startNewSubPath(x, y);
