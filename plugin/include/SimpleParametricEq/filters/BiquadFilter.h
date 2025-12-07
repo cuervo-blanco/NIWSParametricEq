@@ -15,7 +15,7 @@ public:
         z2_.assign(static_cast<size_t>(numChannels_), 0.0f);
 
         bypassMix_.reset(sampleRate_, 0.005);
-        bypassMix_.setCurrentAndTargetValue(1.0f); 
+        bypassMix_.setCurrentAndTargetValue(isBypassed_ ? 0.0f : 1.0f); 
     }
 
     virtual void reset() {
@@ -34,6 +34,9 @@ public:
         for (int n = 0; n < numSamples; ++n) {
             updateSmoothedParameters();
             float mix = bypassMix_.getNextValue();
+            if (mix <= EPSILON) {
+                continue;
+            }
 
             for (int ch = 0; ch < numChannels; ++ch) {
                 auto* channelData = buffer.getWritePointer(ch);
@@ -76,6 +79,7 @@ public:
     }
 
     void setBypassed(bool shouldBypass) noexcept {
+        isBypassed_ = shouldBypass;
         bypassMix_.setTargetValue(shouldBypass ? 0.0f : 1.0f);
     }
 
@@ -97,34 +101,39 @@ public:
     }
 
     float getMagnitudeAtFrequency(double freq) const {
-        if (sampleRate_ <= 0.0) {
+        if (sampleRate_ <= 0.0 || isBypassed_) {
             return 1.0f;
         }
 
-        const auto ω = 2.0 * juce::MathConstants<double>::pi * freq / sampleRate_;
-        const auto cos1 = static_cast<float>(std::cos(ω));
-        const auto sin1 = static_cast<float>(std::sin(ω));
-        const auto cos2 = static_cast<float>(std::cos(2.0 * ω));
-        const auto sin2 = static_cast<float>(std::sin(2.0 * ω));
+        const double omega = juce::MathConstants<double>::twoPi * freq / sampleRate_;
+        const double cos1  = std::cos(omega);
+        const double cos2  = std::cos(2.0 * omega);
 
-        const auto numReal = b0_ + b1_ * cos1 + b2_ * cos2;
-        const auto numImag = -b1_ * sin1 - b2_ * sin2;
+        const auto b0 = static_cast<double>(b0_);
+        const auto b1 = static_cast<double>(b1_);
+        const auto b2 = static_cast<double>(b2_);
+        const auto a1 = static_cast<double>(a1_);
+        const auto a2 = static_cast<double>(a2_);
 
-        const auto denReal = a0_ + a1_ * cos1 + a2_ * cos2;
-        const auto denImag = -a1_ * sin1 - a2_ * sin2;
+        const auto numerator =
+            b0*b0 + b1*b1 + b2*b2
+            + 2.0 * (b0*b1 + b1*b2) * cos1
+            + 2.0 *  b0*b2 * cos2;
 
-        const auto numMag2 = numReal * numReal + numImag * numImag;
-        const auto denMag2 = denReal * denReal + denImag * denImag;
+        const double denominator =
+            1.0 + a1*a1 + a2*a2
+            + 2.0 * (a1 + a1*a2) * cos1
+            + 2.0 * a2 * cos2;
 
-        if (denMag2 <= 0.0f) {
-            return 1.0f;
+        if (denominator <= 0.0 || numerator <= 0.0) {
+            return 1.0f; 
         }
 
-        const auto mag = std::sqrt(numMag2 / denMag2);
+        const auto mag = std::sqrt(numerator / denominator);
         return static_cast<float>(mag);
     }
 
-    float getMagnitudeDbAt (double frequencyHz) const noexcept {
+    float getMagnitudeDbAt(double frequencyHz) const noexcept {
         return juce::Decibels::gainToDecibels(getMagnitudeAtFrequency(frequencyHz));
     }
 
@@ -158,6 +167,8 @@ protected:
     std::vector<float> z2_;
 
     juce::LinearSmoothedValue<float> bypassMix_{1.0f};
+    bool isBypassed_{false};
+
     juce::SmoothedValue<float> qSmoothed_;
     juce::SmoothedValue<float> gainSmoothed_;
     juce::SmoothedValue<float> freqSmoothed_;
@@ -177,6 +188,7 @@ protected:
                                         freqSmoothed_.getCurrentValue());
             lastQ_ = qSmoothed_.getCurrentValue();
             lastA_ = gainSmoothed_.getCurrentValue();
+            lastFreq_ = freqSmoothed_.getCurrentValue();
             coeffsDirty_ = false;
             return;
         }

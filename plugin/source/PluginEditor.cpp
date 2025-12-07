@@ -19,8 +19,11 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     addAndMakeVisible(frequencyAxis_);
     addAndMakeVisible(peakBand0_);
 
+    auto bands = processorRef.getParametricEq().getBands();
+
     frequencyAxis_.setInterceptsMouseClicks(false, false);
     frequencyAxis_.setDbRange(-40.0f, 40.0f);
+    frequencyAxis_.setReferenceBands(bands);
 
     frequencyResponseGUI_.setInterceptsMouseClicks(false, false);
     frequencyResponseGUI_.setSampleRate(processorRef.getSampleRate());
@@ -40,6 +43,7 @@ void AudioPluginAudioProcessorEditor::resized() {
     frequencyResponseGUI_.setBounds(bounds);
     frequencyAxis_.setBounds(bounds);
     peakBand0_.setBounds(bounds);
+
 }
 
 void AudioPluginAudioProcessorEditor::timerCallback() {

@@ -12,6 +12,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
               .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
       ) {
+      std::cout << "HELLO FROM PLUGIN\n";
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {}
@@ -138,19 +139,19 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 
   const auto& lowPass = parameters_.lowPassParameters;
   parametricEq_.setLowPassParameters(
-    static_cast<double>(parameters_.lowPassParameters.frequency.get()),
-    static_cast<double>(parameters_.lowPassParameters.qFactor.get()),
+    static_cast<double>(lowPass.frequency.get()),
+    static_cast<double>(lowPass.qFactor.get()),
     lowPass.bypassed.get()
   );
 
-  const auto& highPass = parameters_.lowPassParameters;
+  const auto& highPass = parameters_.highPassParameters;
   parametricEq_.setHighPassParameters(
-    static_cast<double>(parameters_.highPassParameters.frequency.get()),
-    static_cast<double>(parameters_.highPassParameters.qFactor.get()),
+    static_cast<double>(highPass.frequency.get()),
+    static_cast<double>(highPass.qFactor.get()),
     highPass.bypassed.get()
   );
 
-  parametricEq_.setBypassed(parameters_.bypassed.get());
+  //parametricEq_.setBypassed(parameters_.bypassed.get());
   parametricEq_.processBlock(buffer);
 
   if (parameters_.isPost.get()) {
