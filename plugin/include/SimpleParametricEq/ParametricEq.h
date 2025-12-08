@@ -21,7 +21,6 @@ public:
 
     void prepareFilters();
 
-    void setBypassed(bool isBypassed);
     void setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb, bool isBypassed);
     void setLowShelfParameters(double frequency, double Q, float gainDb, bool isBypassed);
     void setLowPassParameters(double frequency, double Q, bool isBypassed);

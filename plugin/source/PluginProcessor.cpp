@@ -12,7 +12,6 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
               .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
       ) {
-      std::cout << "HELLO FROM PLUGIN\n";
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {}
@@ -77,6 +76,13 @@ void AudioPluginAudioProcessor::prepareToPlay(double sampleRate,
   auto numChannels = std::min(getTotalNumInputChannels(), getTotalNumOutputChannels());
   parametricEq_.prepare(sampleRate, numChannels);
   spectrumAnalyzer_.prepare(sampleRate, numChannels);
+  bypassTransitioner_.prepare({
+    .sampleRate = sampleRate,
+    .maximumBlockSize = static_cast<juce::uint32>(samplesPerBlock),
+    .numChannels = static_cast<juce::uint32>(
+      juce::jmax(getTotalNumInputChannels(), getTotalNumOutputChannels())),
+  });
+
 }
 
 void AudioPluginAudioProcessor::releaseResources() {
@@ -113,6 +119,13 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
     buffer.clear(i, 0, buffer.getNumSamples());
   }
+
+
+  bypassTransitioner_.setBypass(parameters_.bypassed.get());
+  if (parameters_.bypassed.get() && !bypassTransitioner_.isTransitioning() == true) {
+    return;
+  }
+  bypassTransitioner_.setDryBuffer(buffer);
 
   if (!parameters_.isPost.get()) {
     spectrumAnalyzer_.pushBlock(buffer);
@@ -151,8 +164,8 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     highPass.bypassed.get()
   );
 
-  //parametricEq_.setBypassed(parameters_.bypassed.get());
   parametricEq_.processBlock(buffer);
+  bypassTransitioner_.mixToWetBuffer(buffer);
 
   if (parameters_.isPost.get()) {
     spectrumAnalyzer_.pushBlock(buffer);
