@@ -21,6 +21,10 @@ private:
   FrequencyResponseGUI frequencyResponseGUI_;
 
   BandComponent peakBand0_;
+  BandComponent peakBand1_;
+  BandComponent peakBand2_;
+  BandComponent lowPassBand_;
+  BandComponent highPassBand_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessorEditor)
 };
