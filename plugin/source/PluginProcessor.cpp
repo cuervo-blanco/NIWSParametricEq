@@ -154,14 +154,16 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   parametricEq_.setLowPassParameters(
     static_cast<double>(lowPass.frequency.get()),
     static_cast<double>(lowPass.qFactor.get()),
-    lowPass.bypassed.get()
+    lowPass.bypassed.get(),
+    lowPass.slope.getIndex()
   );
 
   const auto& highPass = parameters_.highPassParameters;
   parametricEq_.setHighPassParameters(
     static_cast<double>(highPass.frequency.get()),
     static_cast<double>(highPass.qFactor.get()),
-    highPass.bypassed.get()
+    highPass.bypassed.get(),
+    highPass.slope.getIndex()
   );
 
   parametricEq_.processBlock(buffer);
