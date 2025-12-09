@@ -63,7 +63,7 @@ juce::AudioParameterChoice& createSlopeParameter(
       std::make_unique<juce::AudioParameterChoice>(
           juce::ParameterID{identifier.id, identifier.versionHint},
           identifier.name, 
-          juce::StringArray{"12dB/oct", "24dB/oct", "36dB/oct", "48dB/oct"}, 0));
+          juce::StringArray{"12dB/oct", "24dB/oct", "36dB/oct", "48dB/oct", "96dB/oct"}, 0));
 }
 
 BoostCutParameters createLowShelfParameters(juce::AudioProcessor& processor) {

@@ -7,6 +7,7 @@ static int slopeToSections(Slope s) {
         case Slope::dB24: return 2;
         case Slope::dB36: return 3;
         case Slope::dB48: return 4;
+        case Slope::dB96: return 8;
     }
     return 1;
 }

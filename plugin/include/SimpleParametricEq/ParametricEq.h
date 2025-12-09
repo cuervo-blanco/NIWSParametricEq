@@ -11,7 +11,8 @@ enum class Slope : uint8_t {
     dB12 = 0,
     dB24 = 1,
     dB36 = 2,
-    dB48 = 3
+    dB48 = 3, 
+    dB96 = 4
 };
 class ParametricEq {
 public:
@@ -35,7 +36,7 @@ public:
     std::vector<BiquadFilter*> getBands() noexcept;
     BiquadFilter& getPeakFilter(size_t index);
 private:
-    static constexpr int MAX_SLOPE_SECTIONS = 4; 
+    static constexpr int MAX_SLOPE_SECTIONS = 8; 
 
     int numLowPassSections_ = 1;
     int numHighPassSections_ = 1;
