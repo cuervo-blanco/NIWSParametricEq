@@ -6,21 +6,27 @@ public:
     HighShelfFilter() = default;
     ~HighShelfFilter() override = default;
 private:
-    void calculateAndSetCoefficients(float Q, float amplitude, float frequency) override {
+    void calculateAndSetCoefficients(float S, float A, float frequency) override {
         const auto sampleRate = static_cast<float>(sampleRate_);
         const auto w0 = 2.0f * static_cast<float>(M_PI) * frequency / sampleRate;
+
         const auto cos_w = static_cast<float>(std::cos(w0));
-        const auto alpha = std::sin(w0) / (2.0f * Q);
+        const auto sin_w = static_cast<float>(std::sin(w0));
 
-        const auto A = amplitude;
+        S = std::max(S, 1e-4f);
+
+        const float alpha = (sin_w * 0.5f) 
+            * std::sqrt((A + 1.0f / A) * (1.0f / S - 1.0f) + 2.0f);
+
+
         const auto twoSqrtAlpha = 2.f * std::sqrt(A) * alpha;
-
-        float a0 = (A + 1.f) + (A - 1.f) * cos_w + twoSqrtAlpha;
 
         float b0 = A * ((A + 1.f) + (A - 1.f) * cos_w + twoSqrtAlpha);
         float b1 = -2.f * A * ((A - 1.f) + (A + 1.f) * cos_w);
-        float b2 = A * ((A + 1.f) + (A - 1.f) * cos_w) - twoSqrtAlpha;
-        float a1 = 2.f * ((A - 1.f) + (A + 1.f) * cos_w);
+        float b2 = A * ((A + 1.f) + (A - 1.f) * cos_w - twoSqrtAlpha);
+
+        float a0 = (A + 1.f) - (A - 1.f) * cos_w + twoSqrtAlpha;
+        float a1 = 2.f * ((A - 1.f) - (A + 1.f) * cos_w);
         float a2 = (A + 1.f) - (A - 1.f) * cos_w - twoSqrtAlpha;
 
         b0 /= a0;
@@ -28,7 +34,8 @@ private:
         b2 /= a0;
         a1 /= a0;
         a2 /= a0;
+        a0 /= a0;
 
-        setCoefficients(b0, b1, b2, a0, a1, a2);
+        setCoefficients(b0, b1, b2, 1.0f, a1, a2);
     }
 };

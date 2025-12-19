@@ -2,6 +2,7 @@
 #include <juce_dsp/juce_dsp.h>
 #include "SimpleParametricEq/filters/PeakFilter.h"
 #include "SimpleParametricEq/filters/LowShelfFilter.h"
+#include "SimpleParametricEq/filters/HighShelfFilter.h"
 #include "SimpleParametricEq/filters/LowPassFilter.h"
 #include "SimpleParametricEq/filters/HighPassFilter.h"
 #include "filters/BiquadFilter.h"
@@ -11,7 +12,7 @@ enum class Slope : uint8_t {
     dB12 = 0,
     dB24 = 1,
     dB36 = 2,
-    dB48 = 3, 
+    dB48 = 3,
     dB96 = 4
 };
 class ParametricEq {
@@ -29,20 +30,21 @@ public:
     void prepareFilters();
 
     void setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb, bool isBypassed);
-    void setLowShelfParameters(double frequency, double Q, float gainDb, bool isBypassed);
+    void setLowShelfParameters(double frequency, double Q, float gainDb, bool isBypassed, int slopeIndex);
+    void setHighShelfParameters(double frequency, double Q, float gainDb, bool isBypassed, int slopeIndex);
     void setLowPassParameters(double frequency, double Q, bool isBypassed, int slopeIndex);
     void setHighPassParameters(double frequency, double Q, bool isBypassed, int slopeIndex);
 
     std::vector<BiquadFilter*> getBands() noexcept;
-    BiquadFilter& getPeakFilter(size_t index);
 private:
-    static constexpr int MAX_SLOPE_SECTIONS = 8; 
+    static constexpr int MAX_SLOPE_SECTIONS = 8;
 
     int numLowPassSections_ = 1;
     int numHighPassSections_ = 1;
 
     std::array<PeakFilter, NUM_PEAKS> peakFilters_;
     LowShelfFilter lowShelfFilter_;
+    HighShelfFilter highShelfFilter_;
     std::array<LowPassFilter, MAX_SLOPE_SECTIONS> lowPassFilters_;
     std::array<HighPassFilter, MAX_SLOPE_SECTIONS> highPassFilters_;
 

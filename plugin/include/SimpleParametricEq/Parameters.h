@@ -13,6 +13,7 @@ struct Parameters {
 
     std::array<std::unique_ptr<BoostCutParameters>, ParametricEq::NUM_PEAKS> peakFilters;
     BoostCutParameters lowShelfParameters; 
+    BoostCutParameters highShelfParameters; 
     BaseParameters lowPassParameters;
     BaseParameters highPassParameters;
     

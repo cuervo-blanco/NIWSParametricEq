@@ -11,6 +11,7 @@ static int slopeToSections(Slope s) {
     }
     return 1;
 }
+
 void ParametricEq::prepare(double sampleRate, int numChannels) {
     sampleRate_ = sampleRate;
     numChannels_ = numChannels;
@@ -21,14 +22,26 @@ void ParametricEq::reset() {
     for (auto &filter : peakFilters_) {
         filter.reset();
     }
+
     lowShelfFilter_.reset();
+    highShelfFilter_.reset();
+
+    for (auto &filter : lowPassFilters_) {
+        filter.reset();
+    }
+    for (auto &filter : highPassFilters_) {
+        filter.reset();
+    }
 }
 
 void ParametricEq::processBlock(juce::AudioBuffer<float>& buffer) {
     for (auto &filter : peakFilters_) {
         filter.processBlock(buffer);
     }
+
     lowShelfFilter_.processBlock(buffer);
+
+    highShelfFilter_.processBlock(buffer);
 
     for (int i = 0; i < numLowPassSections_; ++i) {
         lowPassFilters_[static_cast<size_t>(i)].processBlock(buffer);
@@ -41,24 +54,24 @@ void ParametricEq::processBlock(juce::AudioBuffer<float>& buffer) {
 
 void ParametricEq::prepareFilters() {
     auto totalBandFilters = static_cast<int>(peakFilters_.size());
-    for (int i = 0; i < totalBandFilters; ++i) {
-        jassert(static_cast<size_t>(i) < NUM_PEAKS);
-        auto freq = *std::next(DEFAULT_FREQS.begin(), i);
-        peakFilters_[static_cast<size_t>(i)].prepare(sampleRate_, numChannels_);
-        peakFilters_[static_cast<size_t>(i)].setParametersAndReset(freq, 1.0);
+    for (int band = 0; band < totalBandFilters; ++band) {
+        jassert(static_cast<size_t>(band) < NUM_PEAKS);
+        auto freq = *std::next(DEFAULT_FREQS.begin(), band);
+        peakFilters_[static_cast<size_t>(band)].prepare(sampleRate_, numChannels_);
+        peakFilters_[static_cast<size_t>(band)].setParametersAndReset(freq, 1.0);
     }
 
     lowShelfFilter_.prepare(sampleRate_, numChannels_);
     lowShelfFilter_.setParametersAndReset(80.0, 1.0);
 
+    highShelfFilter_.prepare(sampleRate_, numChannels_);
+    highShelfFilter_.setParametersAndReset(15000.0, 1.0);
     for (int i = 0; i < MAX_SLOPE_SECTIONS; ++i) {
         highPassFilters_[static_cast<size_t>(i)].prepare(sampleRate_, numChannels_);
         highPassFilters_[static_cast<size_t>(i)].setParametersAndReset(40.0, 1.0);
-    }
 
-    for (int i = 0; i < MAX_SLOPE_SECTIONS; ++i) {
         lowPassFilters_[static_cast<size_t>(i)].prepare(sampleRate_, numChannels_);
-        lowPassFilters_[static_cast<size_t>(i)].setParametersAndReset(15000.0, 1.0);
+        lowPassFilters_[static_cast<size_t>(i)].setParametersAndReset(18000.0, 1.0);
     }
 }
 
@@ -69,17 +82,27 @@ void ParametricEq::setPeakParameters(size_t bandIndex,
     } else if (bandIndex < peakFilters_.size() && bandIndex >= 0) {
         peakFilters_[bandIndex].setFrequency(frequency);
         peakFilters_[bandIndex].setQ(Q);
-        peakFilters_[bandIndex].setAmplitude(gainDb);
+        peakFilters_[bandIndex].setAmplitude40(gainDb);
         peakFilters_[bandIndex].setBypassed(isBypassed);
     }
 }
 
 void ParametricEq::setLowShelfParameters(double frequency, double Q, 
-    float gainDb, bool isBypassed) {
+    float gainDb, bool isBypassed, int slopeIndex) {
+    juce::ignoreUnused(slopeIndex);
     lowShelfFilter_.setFrequency(frequency);
     lowShelfFilter_.setQ(Q);
-    lowShelfFilter_.setAmplitude(gainDb);
+    lowShelfFilter_.setAmplitude40(gainDb);
     lowShelfFilter_.setBypassed(isBypassed);
+}
+
+void ParametricEq::setHighShelfParameters(double frequency, double Q, 
+    float gainDb, bool isBypassed, int slopeIndex) {
+    juce::ignoreUnused(slopeIndex);
+    highShelfFilter_.setFrequency(frequency);
+    highShelfFilter_.setQ(Q);
+    highShelfFilter_.setAmplitude40(gainDb);
+    highShelfFilter_.setBypassed(isBypassed);
 }
 
 void ParametricEq::setLowPassParameters(double frequency, double Q, bool isBypassed, int slopeIndex) {
@@ -110,6 +133,7 @@ std::vector<BiquadFilter*> ParametricEq::getBands() noexcept {
     }
 
     result.push_back(&lowShelfFilter_);
+    result.push_back(&highShelfFilter_);
 
     for (int i = 0; i < numLowPassSections_; ++i) {
         result.push_back(&lowPassFilters_[static_cast<size_t>(i)]);
@@ -121,11 +145,4 @@ std::vector<BiquadFilter*> ParametricEq::getBands() noexcept {
 
     return result;
 }
-
-
-BiquadFilter& ParametricEq::getPeakFilter(size_t index) {
-    jassert(index < NUM_PEAKS);
-    return peakFilters_[index];
-}
-
 } // namespace parametric_eq

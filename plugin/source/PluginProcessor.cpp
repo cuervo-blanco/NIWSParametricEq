@@ -147,7 +147,17 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     static_cast<double>(lowShelf.base.frequency.get()),
     static_cast<double>(lowShelf.base.qFactor.get()),
     lowShelf.gain.get(),
-    lowShelf.base.bypassed.get()
+    lowShelf.base.bypassed.get(),
+    lowShelf.base.slope.getIndex()
+  );
+
+  const auto& highShelf = parameters_.highShelfParameters;
+  parametricEq_.setHighShelfParameters(
+    static_cast<double>(highShelf.base.frequency.get()),
+    static_cast<double>(highShelf.base.qFactor.get()),
+    highShelf.gain.get(),
+    highShelf.base.bypassed.get(),
+    highShelf.base.slope.getIndex()
   );
 
   const auto& lowPass = parameters_.lowPassParameters;

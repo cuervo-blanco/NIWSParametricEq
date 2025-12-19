@@ -23,8 +23,13 @@ private:
   BandComponent peakBand0_;
   BandComponent peakBand1_;
   BandComponent peakBand2_;
+  BandComponent peakBand3_;
+
   BandComponent lowPassBand_;
   BandComponent highPassBand_;
+
+  BandComponent highShelfBand_;
+  BandComponent lowShelfBand_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessorEditor)
 };

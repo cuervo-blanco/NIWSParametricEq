@@ -35,6 +35,16 @@ juce::AudioParameterFloat& createQParameter(juce::AudioProcessor& processor, Ide
             juce::AudioParameterFloatAttributes{}.withLabel("")));
 }
 
+juce::AudioParameterFloat& createShelfSlopeParameter(juce::AudioProcessor& processor, Identifier identifier){
+    return addParameterToProcessor(
+        processor,
+        std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{identifier.id, identifier.versionHint}, identifier.name,
+            juce::NormalisableRange<float>{0.1f, 1.f, 0.1f, 0.5f}, 
+            1.f,
+            juce::AudioParameterFloatAttributes{}.withLabel("")));
+}
+
 juce::AudioParameterFloat& createGainParameter(juce::AudioProcessor& processor, Identifier identifier){
     return addParameterToProcessor(
         processor,
@@ -75,7 +85,26 @@ BoostCutParameters createLowShelfParameters(juce::AudioProcessor& processor) {
     Identifier slopeIdentifier = {"lowShelfSlope", "Low Shelf Slope", versionHint};
 
     auto& frequency = createFrequencyParameter(processor, frequencyIdentifier, 80.f);
-    auto& q = createQParameter(processor, qIdentifier);
+    auto& q = createShelfSlopeParameter(processor, qIdentifier);
+    auto& gain = createGainParameter(processor, gainIdentifier);
+    auto& slope = createSlopeParameter(processor, slopeIdentifier);
+    auto& bypassed = createBypassedParameter(processor, bypassIdentifier);
+
+    BoostCutParameters parameters = {{frequency, q, slope, bypassed}, gain };
+
+    return parameters;
+}
+
+BoostCutParameters createHighShelfParameters(juce::AudioProcessor& processor) {
+    auto versionHint = 1;
+    Identifier frequencyIdentifier = {"highShelfFrequency", "High Shelf Frequency", versionHint};
+    Identifier qIdentifier = {"highShelfQ", "High Shelf Q-Factor", versionHint};
+    Identifier gainIdentifier = {"highShelfGain", "High Shelf Gain", versionHint};
+    Identifier bypassIdentifier = {"highShelfBypass", "High Shelf Bypass", versionHint};
+    Identifier slopeIdentifier = {"highShelfSlope", "High Shelf Slope", versionHint};
+
+    auto& frequency = createFrequencyParameter(processor, frequencyIdentifier, 15000.f);
+    auto& q = createShelfSlopeParameter(processor, qIdentifier);
     auto& gain = createGainParameter(processor, gainIdentifier);
     auto& slope = createSlopeParameter(processor, slopeIdentifier);
     auto& bypassed = createBypassedParameter(processor, bypassIdentifier);
@@ -151,6 +180,7 @@ Parameters::Parameters(juce::AudioProcessor& processor)
       : bypassed{createBypassedParameter(processor, {"bypassed", "Bypass", 1})},
       peakFilters{createPeakFilterParameters(processor)},
       lowShelfParameters{createLowShelfParameters(processor)},  
+      highShelfParameters{createHighShelfParameters(processor)},  
       lowPassParameters{createLowPassParameters(processor)},
       highPassParameters{createHighPassParameters(processor)},
       isPost{createBypassedParameter(processor, {"isPost", "Post", 1})} {}
