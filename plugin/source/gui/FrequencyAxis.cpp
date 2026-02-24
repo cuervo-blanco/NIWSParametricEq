@@ -66,7 +66,7 @@ void FrequencyAxis::drawZeroLine(juce::Graphics& g, juce::Rectangle<float> bound
     const auto zeroY = juce::jmap(zeroNorm, 0.0f, 1.0f,
                                       bounds.getY(), bounds.getBottom());
 
-    g.setColour(juce::Colours::orange.withAlpha(0.9f));
+    g.setColour(juce::Colour(222,140,0).withAlpha(0.9f));
     g.drawLine(bounds.getX(), zeroY, bounds.getRight(), zeroY, 1.5f);
 
     g.drawFittedText("0 dB",
@@ -82,7 +82,8 @@ void FrequencyAxis::drawResponse(juce::Graphics& g,
                                  const std::vector<BiquadFilter*>& bands,
                                  juce::Colour colour,
                                  float thickness,
-                                 float alpha) {
+                                 float alpha)
+{
     if (bands.empty()) {
         return;
     }

@@ -32,6 +32,12 @@ public:
 
         freq_ = static_cast<double>(freqParam_);
         gainDb_ = gainParam_;
+
+        hasGain_ = (type == BandType::Peak
+                 || type == BandType::LowShelf
+                 || type == BandType::HighShelf
+                 || type == BandType::BandPass
+                 || type == BandType::Notch);
     }
 
     void setDbRange (float minDb, float maxDb) {
@@ -46,6 +52,14 @@ public:
         freq_ = static_cast<double>(freqParam_);
         gainDb_ = gainParam_;
         repaint();
+    }
+
+    void mouseEnter(const juce::MouseEvent&) override {
+        setMouseCursor(juce::MouseCursor::PointingHandCursor);
+    }
+
+    void mouseExit(const juce::MouseEvent&) override {
+        setMouseCursor(juce::MouseCursor::NormalCursor);
     }
 
     void mouseDown (const juce::MouseEvent& e) override {
@@ -78,13 +92,15 @@ public:
                                          logStart + dragFracX * logRange);
         const auto newFreq = std::pow(10.0, logNew);
 
-        const auto gainRange = maxDb_ - minDb_;
-        const auto gainPerPix = gainRange / bounds.getHeight();
-        const auto newGainDb = juce::jlimit(minDb_, maxDb_,
-                                            startGainDb_ - dy * gainPerPix);
-
         setFrequencyFromUI(newFreq);
-        setGainFromUI(newGainDb);
+        const auto diff = std::abs(minDb_ - maxDb_);
+        if (hasGain_ && diff > 1e-3f) {
+            const auto gainRange = maxDb_ - minDb_;
+            const auto gainPerPix = gainRange / bounds.getHeight();
+            const auto newGainDb = juce::jlimit(minDb_, maxDb_,
+                                                startGainDb_ - dy * gainPerPix);
+            setGainFromUI(newGainDb);
+        }
     }
 
     void mouseUp (const juce::MouseEvent&) override {
@@ -97,13 +113,13 @@ public:
         auto centre = getHandlePosition(bounds);
         const auto radius = 6.0f;
 
-        g.setColour(juce::Colours::black.withAlpha(0.5f));
+        g.setColour(juce::Colours::white);
         g.fillEllipse(centre.x - (radius + 1.0f),
                       centre.y - (radius + 1.0f),
                       2.0f * (radius + 1.0f),
                       2.0f * (radius + 1.0f));
 
-        g.setColour(juce::Colours::orange);
+        g.setColour(juce::Colour(222,140,0));
         g.fillEllipse(centre.x - radius,
                       centre.y - radius,
                       2.0f * radius,
@@ -135,14 +151,32 @@ private:
     }
 
     juce::Point<float> getHandlePosition (juce::Rectangle<float> bounds) const {
-        const auto x = parametric_eq::freqmap::frequencyToX(static_cast<float>(freq_), bounds);
+    const auto x = parametric_eq::freqmap::frequencyToX(static_cast<float>(freq_), bounds);
 
+    auto y = bounds.getCentreY();
+
+    const auto diff = std::abs(minDb_ - maxDb_);
+    if (hasGain_ && diff > 1e-3f) {
         const auto dbClamped = juce::jlimit(minDb_, maxDb_, gainDb_);
         const auto yNorm = juce::jmap(dbClamped, minDb_, maxDb_, 1.0f, 0.0f);
-        const auto y = juce::jmap(yNorm, 0.0f, 1.0f,
-                                  bounds.getY(), bounds.getBottom());
+        y = juce::jmap(yNorm, 0.0f, 1.0f,
+                       bounds.getY(), bounds.getBottom());
+    } else {
+        y = bounds.getCentreY();
+    }
 
-        return {x, y};
+    return { x, y };
+}
+
+
+    bool hitTest (int x, int y) override {
+        auto bounds = getLocalBounds().toFloat();
+        auto centre = getHandlePosition(bounds);
+
+        constexpr float handleRadius = 8.0f;
+        juce::Point<float> p { static_cast<float>(x), static_cast<float>(y) };
+
+        return p.getDistanceFrom(centre) <= handleRadius;
     }
 
     juce::AudioParameterFloat& freqParam_;
@@ -159,4 +193,6 @@ private:
     juce::Point<float> dragStartPos_;
     double startFreq_{1000.0};
     float startGainDb_{0.0f};
+
+    bool hasGain_ { true };
 };

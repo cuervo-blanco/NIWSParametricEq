@@ -2,11 +2,19 @@
 #include <juce_dsp/juce_dsp.h>
 #include "NIWSParametricEq/filters/PeakFilter.h"
 #include "NIWSParametricEq/filters/LowShelfFilter.h"
+#include "NIWSParametricEq/filters/HighShelfFilter.h"
 #include "NIWSParametricEq/filters/LowPassFilter.h"
 #include "NIWSParametricEq/filters/HighPassFilter.h"
 #include "filters/BiquadFilter.h"
 
 namespace parametric_eq {
+enum class Slope : uint8_t {
+    dB12 = 0,
+    dB24 = 1,
+    dB36 = 2,
+    dB48 = 3,
+    dB96 = 4
+};
 class ParametricEq {
 public:
     static size_t const NUM_PEAKS = 4;
@@ -21,19 +29,24 @@ public:
 
     void prepareFilters();
 
-    void setBypassed(bool isBypassed);
     void setPeakParameters(size_t bandIndex, double frequency, double Q, float gainDb, bool isBypassed);
-    void setLowShelfParameters(double frequency, double Q, float gainDb, bool isBypassed);
-    void setLowPassParameters(double frequency, double Q, bool isBypassed);
-    void setHighPassParameters(double frequency, double Q, bool isBypassed);
+    void setLowShelfParameters(double frequency, double Q, float gainDb, bool isBypassed, int slopeIndex);
+    void setHighShelfParameters(double frequency, double Q, float gainDb, bool isBypassed, int slopeIndex);
+    void setLowPassParameters(double frequency, double Q, bool isBypassed, int slopeIndex);
+    void setHighPassParameters(double frequency, double Q, bool isBypassed, int slopeIndex);
 
     std::vector<BiquadFilter*> getBands() noexcept;
-    BiquadFilter& getPeakFilter(size_t index);
 private:
+    static constexpr int MAX_SLOPE_SECTIONS = 8;
+
+    int numLowPassSections_ = 1;
+    int numHighPassSections_ = 1;
+
     std::array<PeakFilter, NUM_PEAKS> peakFilters_;
     LowShelfFilter lowShelfFilter_;
-    LowPassFilter lowPassFilter_;
-    HighPassFilter highPassFilter_;
+    HighShelfFilter highShelfFilter_;
+    std::array<LowPassFilter, MAX_SLOPE_SECTIONS> lowPassFilters_;
+    std::array<HighPassFilter, MAX_SLOPE_SECTIONS> highPassFilters_;
 
     double sampleRate_{44100.0};
     int numChannels_;

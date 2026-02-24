@@ -12,7 +12,6 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
               .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
       ) {
-      std::cout << "HELLO FROM PLUGIN\n";
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {}
@@ -77,6 +76,13 @@ void AudioPluginAudioProcessor::prepareToPlay(double sampleRate,
   auto numChannels = std::min(getTotalNumInputChannels(), getTotalNumOutputChannels());
   parametricEq_.prepare(sampleRate, numChannels);
   spectrumAnalyzer_.prepare(sampleRate, numChannels);
+  bypassTransitioner_.prepare({
+    .sampleRate = sampleRate,
+    .maximumBlockSize = static_cast<juce::uint32>(samplesPerBlock),
+    .numChannels = static_cast<juce::uint32>(
+      juce::jmax(getTotalNumInputChannels(), getTotalNumOutputChannels())),
+  });
+
 }
 
 void AudioPluginAudioProcessor::releaseResources() {
@@ -114,6 +120,13 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     buffer.clear(i, 0, buffer.getNumSamples());
   }
 
+
+  bypassTransitioner_.setBypass(parameters_.bypassed.get());
+  if (parameters_.bypassed.get() && !bypassTransitioner_.isTransitioning() == true) {
+    return;
+  }
+  bypassTransitioner_.setDryBuffer(buffer);
+
   if (!parameters_.isPost.get()) {
     spectrumAnalyzer_.pushBlock(buffer);
   }
@@ -134,25 +147,37 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     static_cast<double>(lowShelf.base.frequency.get()),
     static_cast<double>(lowShelf.base.qFactor.get()),
     lowShelf.gain.get(),
-    lowShelf.base.bypassed.get()
+    lowShelf.base.bypassed.get(),
+    lowShelf.base.slope.getIndex()
+  );
+
+  const auto& highShelf = parameters_.highShelfParameters;
+  parametricEq_.setHighShelfParameters(
+    static_cast<double>(highShelf.base.frequency.get()),
+    static_cast<double>(highShelf.base.qFactor.get()),
+    highShelf.gain.get(),
+    highShelf.base.bypassed.get(),
+    highShelf.base.slope.getIndex()
   );
 
   const auto& lowPass = parameters_.lowPassParameters;
   parametricEq_.setLowPassParameters(
     static_cast<double>(lowPass.frequency.get()),
     static_cast<double>(lowPass.qFactor.get()),
-    lowPass.bypassed.get()
+    lowPass.bypassed.get(),
+    lowPass.slope.getIndex()
   );
 
   const auto& highPass = parameters_.highPassParameters;
   parametricEq_.setHighPassParameters(
     static_cast<double>(highPass.frequency.get()),
     static_cast<double>(highPass.qFactor.get()),
-    highPass.bypassed.get()
+    highPass.bypassed.get(),
+    highPass.slope.getIndex()
   );
 
-  //parametricEq_.setBypassed(parameters_.bypassed.get());
   parametricEq_.processBlock(buffer);
+  bypassTransitioner_.mixToWetBuffer(buffer);
 
   if (parameters_.isPost.get()) {
     spectrumAnalyzer_.pushBlock(buffer);

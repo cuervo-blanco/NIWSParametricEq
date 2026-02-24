@@ -100,6 +100,12 @@ public:
         gainSmoothed_.setTargetValue(A);
     }
 
+    void setAmplitude40(float gainDb) {
+        gainDbRaw_ = gainDb;
+        const float A = std::pow(10.0f, gainDbRaw_ / 40.0f);
+        gainSmoothed_.setTargetValue(A);
+    }
+
     float getMagnitudeAtFrequency(double freq) const {
         if (sampleRate_ <= 0.0 || isBypassed_) {
             return 1.0f;

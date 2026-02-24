@@ -4,6 +4,7 @@
 #include "ParametricEq.h"
 #include "Parameters.h"
 #include "SpectrumAnalyzer.h"
+#include "BypassTransitioner.h"
 
 namespace parametric_eq {
 class AudioPluginAudioProcessor : public juce::AudioProcessor {
@@ -52,6 +53,8 @@ private:
   ParametricEq parametricEq_;
   Parameters parameters_{*this};
   SpectrumAnalyzer spectrumAnalyzer_{12}; 
+
+  BypassTransitioner bypassTransitioner_{0.02};
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessor)
 };
