@@ -1,6 +1,6 @@
-#include "SimpleParametricEq/gui/FrequencyAxis.h"
-#include "SimpleParametricEq/gui/FrequencyMapping.h"
-#include "SimpleParametricEq/filters/BiquadFilter.h"
+#include "NIWSParametricEq/gui/FrequencyAxis.h"
+#include "NIWSParametricEq/gui/FrequencyMapping.h"
+#include "NIWSParametricEq/filters/BiquadFilter.h"
 
 namespace parametric_eq {
 void FrequencyAxis::paint(juce::Graphics& g) {

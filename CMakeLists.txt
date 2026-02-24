@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(SimpleParametricEQ)
+project(NIWSParametricEQ)
 
 set(CMAKE_CXX_STANDARD 20)
 

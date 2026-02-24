@@ -1,7 +1,7 @@
-#include "SimpleParametricEq/PluginEditor.h"
-#include "SimpleParametricEq/PluginProcessor.h"
-#include "SimpleParametricEq/ParametricEq.h"
-#include "SimpleParametricEq/Parameters.h"
+#include "NIWSParametricEq/PluginEditor.h"
+#include "NIWSParametricEq/PluginProcessor.h"
+#include "NIWSParametricEq/ParametricEq.h"
+#include "NIWSParametricEq/Parameters.h"
 
 namespace parametric_eq {
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(

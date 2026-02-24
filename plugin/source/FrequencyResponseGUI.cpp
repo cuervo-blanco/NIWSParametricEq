@@ -1,5 +1,5 @@
-#include "SimpleParametricEq/FrequencyResponseGUI.h"
-#include "SimpleParametricEq/gui/FrequencyMapping.h"
+#include "NIWSParametricEq/FrequencyResponseGUI.h"
+#include "NIWSParametricEq/gui/FrequencyMapping.h"
 
 namespace parametric_eq {
 void FrequencyResponseGUI::paint(juce::Graphics& g) {

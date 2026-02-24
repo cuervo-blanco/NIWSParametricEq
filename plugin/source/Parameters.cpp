@@ -1,6 +1,7 @@
-#include "SimpleParametricEq/Parameters.h"
-#include "SimpleParametricEq/ParametricEq.h"
-#include "SimpleParametricEq/filters/FilterParameters.h"
+#include "NIWSParametricEq/Parameters.h"
+#include "NIWSParametricEq/ParametricEq.h"
+#include "NIWSParametricEq/filters/FilterParameters.h"
+
 namespace parametric_eq {
 namespace {
 struct Identifier {

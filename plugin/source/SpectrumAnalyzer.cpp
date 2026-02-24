@@ -1,4 +1,4 @@
-#include "SimpleParametricEq/SpectrumAnalyzer.h"
+#include "NIWSParametricEq/SpectrumAnalyzer.h"
 
 SpectrumAnalyzer::SpectrumAnalyzer(int fftOrder)
     : fftOrder_(fftOrder),

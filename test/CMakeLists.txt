@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(SimpleParametricEqTest)
+project(NIWSParametricEqTest)
 
 enable_testing()
 
@@ -11,7 +11,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 ${GOOGLETEST_SOURCE_DIR}/googletest/include
 ${CMAKE_SOURCE_DIR}/plugin/include)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE SimpleParametricEq GTest::gtest_main)
+target_link_libraries(${PROJECT_NAME} PRIVATE NIWSParametricEq
+ GTest::gtest_main)
 
 set_source_files_properties(${SOURCE_FILES} PROPERTIES COMPILE_OPTIONS "${PROJECT_WARNINGS_CXX}")
 

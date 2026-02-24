@@ -1,4 +1,4 @@
-#include "SimpleParametricEq/ParametricEq.h"
+#include "NIWSParametricEq/ParametricEq.h"
 
 namespace parametric_eq {
 void ParametricEq::prepare(double sampleRate, int numChannels) {

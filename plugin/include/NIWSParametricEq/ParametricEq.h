@@ -1,9 +1,9 @@
 #pragma once
 #include <juce_dsp/juce_dsp.h>
-#include "SimpleParametricEq/filters/PeakFilter.h"
-#include "SimpleParametricEq/filters/LowShelfFilter.h"
-#include "SimpleParametricEq/filters/LowPassFilter.h"
-#include "SimpleParametricEq/filters/HighPassFilter.h"
+#include "NIWSParametricEq/filters/PeakFilter.h"
+#include "NIWSParametricEq/filters/LowShelfFilter.h"
+#include "NIWSParametricEq/filters/LowPassFilter.h"
+#include "NIWSParametricEq/filters/HighPassFilter.h"
 #include "filters/BiquadFilter.h"
 
 namespace parametric_eq {

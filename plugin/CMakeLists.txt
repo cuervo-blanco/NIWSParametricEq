@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(SimpleParametricEq VERSION 0.1.0)
+project(NIWSParametricEq VERSION 0.1.0)
 
-set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/SimpleParametricEq")
+set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/NIWSParametricEq")
 
 juce_add_plugin(
   ${PROJECT_NAME}
   COMPANY_NAME
-  "Nirioonossian"
+  "NIWS"
   IS_SYNTH
   FALSE 
   NEEDS_MIDI_INPUT
@@ -15,15 +15,15 @@ juce_add_plugin(
   NEEDS_MIDI_OUTPUT
   FALSE 
   PLUGIN_MANUFACTURER_CODE
-  Niro
+  Niws
   PLUGIN_CODE
-  Speq
+  Npeq
   FORMATS
   Standalone
   VST3
   AU
   PRODUCT_NAME
-  "Simple Parametric EQ"
+  "NIWS Parametric EQ"
   COPY_PLUGIN_AFTER_BUILD
   TRUE
 )

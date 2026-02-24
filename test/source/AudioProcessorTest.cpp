@@ -1,4 +1,4 @@
-#include <SimpleParametricEq/PluginProcessor.h>
+#include <NIWSParametricEq/PluginProcessor.h>
 #include <gtest/gtest.h>
 
 namespace parametric_eq_test {
