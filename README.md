@@ -13,12 +13,12 @@ The filters are built using the [Audio EQ Cookbook](https://webaudio.github.io/A
 ## Work in Progress
 With no particular order, here is some of the work remaining.
 
-[] Higher Order filters.
-[] GUI control for the Q.
-[] LFO with variable speed and shape that controls a selected parameter.
-[] LFO control (atleast 3 LFO's to start with)
-[] Refine GUI.
-[] Unit tests.
+- [ ] Higher Order filters.
+- [ ] GUI control for the Q.
+- [ ] LFO with variable speed and shape that controls a selected parameter.
+- [ ] LFO control (atleast 3 LFO's to start with)
+- [ ] Refine GUI.IIR biquad filters
+- [ ] Unit tests.
 
 ### Footnotes
 
