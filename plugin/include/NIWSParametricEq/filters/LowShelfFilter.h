@@ -6,14 +6,15 @@ public:
     LowShelfFilter() = default;
     ~LowShelfFilter() override = default;
 private:
-    void calculateAndSetCoefficients(float S, float A, float frequency) override {
+
+    void calculateAndSetCoefficients(float Q, float A, float frequency) override {
         const auto sampleRate = static_cast<float>(sampleRate_);
         const auto w0 = 2.0f * static_cast<float>(M_PI) * frequency / sampleRate;
 
         const auto cos_w = static_cast<float>(std::cos(w0));
         const auto sin_w = static_cast<float>(std::sin(w0));
 
-        S = std::max(S, 1e-4f);
+        auto S = shelfSlopeS_from_Q(Q, A);
 
         const float alpha = (sin_w * 0.5f) 
             * std::sqrt((A + 1.0f / A) * (1.0f / S - 1.0f) + 2.0f);

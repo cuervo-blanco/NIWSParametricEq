@@ -159,6 +159,15 @@ protected:
         a2_ = a2;
     }
 
+    float shelfSlopeS_from_Q(float Q, float A) {
+        const float invQ2 = 1.0f / (Q * Q);
+        const float ApInvA = A + 1.0f / A;
+
+        const float invS = 1.0f + (invQ2 - 2.0f) / ApInvA;
+
+        return 1.0f / juce::jmax(invS, 1e-6f);
+    }
+
     double sampleRate_{44100.0};
     int numChannels_{0};
 

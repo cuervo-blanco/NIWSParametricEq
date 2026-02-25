@@ -41,7 +41,7 @@ juce::AudioParameterFloat& createShelfSlopeParameter(juce::AudioProcessor& proce
         processor,
         std::make_unique<juce::AudioParameterFloat>(
             juce::ParameterID{identifier.id, identifier.versionHint}, identifier.name,
-            juce::NormalisableRange<float>{0.1f, 1.f, 0.1f, 0.5f}, 
+            juce::NormalisableRange<float>{0.1f, 2.f, 0.1f, 0.5f}, 
             1.f,
             juce::AudioParameterFloatAttributes{}.withLabel("")));
 }
