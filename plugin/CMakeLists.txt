@@ -22,6 +22,7 @@ juce_add_plugin(
   Standalone
   VST3
   AU
+  AAX
   PRODUCT_NAME
   "NIWS Parametric EQ"
   COPY_PLUGIN_AFTER_BUILD

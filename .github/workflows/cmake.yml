@@ -3,8 +3,13 @@ name: CMake
 on:
   push:
     branches: [ "main" ]
+    tags:
+      - "v*"
   pull_request:
     branches: [ "main" ]
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -32,3 +37,88 @@ jobs:
 
       - name: Build
         run: cmake --build build --config ${{ matrix.build_type }}
+
+      - name: Upload raw build artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-${{ matrix.build_type }}-artefacts
+          path: |
+            build/plugin/NIWSParametricEq_artefacts/**
+
+      - name: Package plugins (macOS)
+        if: matrix.os == 'macos-14'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARTEFACT_DIR="build/plugin/NIWSParametricEq_artefacts/${{ matrix.build_type }}"
+          echo "Artefacts dir: $ARTEFACT_DIR"
+          mkdir -p dist
+
+          # VST3
+          if compgen -G "$ARTEFACT_DIR/VST3/*.vst3" > /dev/null; then
+            for p in "$ARTEFACT_DIR"/VST3/*.vst3; do
+              base="$(basename "$p")"
+              ditto -c -k --sequesterRsrc --keepParent "$p" "dist/${{ matrix.os }}-${{ matrix.build_type }}-${base}.zip"
+            done
+          fi
+
+          # AU
+          if compgen -G "$ARTEFACT_DIR/AU/*.component" > /dev/null; then
+            for p in "$ARTEFACT_DIR"/AU/*.component; do
+              base="$(basename "$p")"
+              ditto -c -k --sequesterRsrc --keepParent "$p" "dist/${{ matrix.os }}-${{ matrix.build_type }}-${base}.zip"
+            done
+          fi
+
+          ls -lah dist
+
+      - name: Package plugins (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $artefacts = Get-ChildItem -Directory build/plugin | Where-Object { $_.Name -eq "NIWSParametricEq_artefacts" } | Select-Object -First 1
+          if (-not $artefacts) { throw "Artefacts folder not found." }
+          $dir = Join-Path $artefacts.FullName "${{ matrix.build_type }}"
+          Write-Host "Artefacts dir: $dir"
+          New-Item -ItemType Directory -Force dist | Out-Null
+
+          # VST3 (Windows)
+          $vst3Dir = Join-Path $dir "VST3"
+          if (Test-Path $vst3Dir) {
+            $vst3 = Get-ChildItem -Path $vst3Dir -Filter *.vst3
+            foreach ($p in $vst3) {
+              $zip = Join-Path "dist" ("${{ matrix.os }}-${{ matrix.build_type }}-" + $p.Name + ".zip")
+              Compress-Archive -Path (Join-Path $p.FullName '*') -DestinationPath $zip -Force
+            }
+          } else {
+            Write-Host "No VST3 directory at $vst3Dir"
+          }
+
+          Get-ChildItem dist
+
+      - name: Upload packaged zips
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-${{ matrix.build_type }}-packages
+          path: dist/*.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all packaged zips
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-packages"
+          path: dist
+
+      - name: List files to release
+        run: ls -lah dist
+
+      - name: Create GitHub Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*.zip
+          generate_release_notes: true
