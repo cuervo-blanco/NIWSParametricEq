@@ -1,4 +1,5 @@
 #pragma once
+#include <numbers>
 
 #include "FilterParameters.h"
 
@@ -10,7 +11,7 @@ private:
     void calculateAndSetCoefficients(float Q, float amplitude, float frequency) override {
         juce::ignoreUnused(amplitude);
         const auto sampleRate = static_cast<float>(sampleRate_);    
-        const auto w0 = 2.0f * static_cast<float>(M_PI) * frequency / sampleRate;
+        const auto w0 = 2.0f * std::numbers::pi_v<float> * frequency / sampleRate;
         const auto cos_w = static_cast<float>(std::cos(w0));
         const auto alpha = std::sin(w0) / (2.0f * Q);
 
