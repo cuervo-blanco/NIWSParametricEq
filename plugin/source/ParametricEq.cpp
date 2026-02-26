@@ -75,16 +75,16 @@ void ParametricEq::prepareFilters() {
     }
 }
 
-void ParametricEq::setPeakParameters(size_t bandIndex, 
+void ParametricEq::setPeakParameters(size_t bandIndex,
     double frequency, double Q, float gainDb, bool isBypassed) {
-    if (bandIndex >= peakFilters_.size() || bandIndex < 0) {
+    if (bandIndex >= peakFilters_.size()) {
         return;
-    } else if (bandIndex < peakFilters_.size() && bandIndex >= 0) {
-        peakFilters_[bandIndex].setFrequency(frequency);
-        peakFilters_[bandIndex].setQ(Q);
-        peakFilters_[bandIndex].setAmplitude40(gainDb);
-        peakFilters_[bandIndex].setBypassed(isBypassed);
     }
+
+    peakFilters_[bandIndex].setFrequency(frequency);
+    peakFilters_[bandIndex].setQ(Q);
+    peakFilters_[bandIndex].setAmplitude40(gainDb);
+    peakFilters_[bandIndex].setBypassed(isBypassed);
 }
 
 void ParametricEq::setLowShelfParameters(double frequency, double Q, 
