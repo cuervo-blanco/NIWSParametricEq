@@ -22,6 +22,9 @@ With no particular order, here is some of the work remaining.
 - [ ] Unit tests.
 - [ ] Capacity to save presets and reload state.
 
+## Special Mentions
+A big part of this project would not have been possible without the big amount of resources available in [Jan Wilczek's (WolfSound)](https://github.com/JanWilczek) github, videos, official website and courses. Modules such as the [JsonSerializer](https://github.com/cuervo-blanco/NIWSParametricEq/blob/main/plugin/include/NIWSParametricEq/JsonSerializer.h) and the [Bypass Transitioner](https://github.com/cuervo-blanco/NIWSParametricEq/blob/main/plugin/include/NIWSParametricEq/BypassTransitioner.h) are inspired directly from WolfSound's official [Juce Development Course](https://www.wolfsoundacademy.com/juce). 
+
 ### Footnotes
 
 [^1]:NIWS is a short hand for [Nirioonossian World-Sound](https://gurdjieff.work/ae/neologisms/Nirioonossian.htm). I am deciding to use this name at the moment, although to be honest with you its meaning surpasses my brain. Yes, the universal tone, A.K.A Aum...but with regards to this plugin it may just be a aesthetical choice at the moment, a guiding element. Perhaps on a later version this may be updated and changed.
