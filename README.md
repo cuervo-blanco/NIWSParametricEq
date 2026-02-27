@@ -1,4 +1,5 @@
 # NIWS[^1] Parametric EQ
+A Simple Parametric EQ with LFOs to control parameters.
 
 ## Purpose
 
@@ -19,6 +20,7 @@ With no particular order, here is some of the work remaining.
 - [ ] LFO control (atleast 3 LFO's to start with)
 - [ ] Refine GUI.IIR biquad filters
 - [ ] Unit tests.
+- [ ] Capacity to save presets and reload state.
 
 ### Footnotes
 
