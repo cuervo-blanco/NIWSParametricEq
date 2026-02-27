@@ -1,5 +1,6 @@
 #include "NIWSParametricEq/PluginProcessor.h"
 #include "NIWSParametricEq/PluginEditor.h"
+#include "NIWSParametricEq/JsonSerializer.h"
 
 namespace parametric_eq {
 AudioPluginAudioProcessor::AudioPluginAudioProcessor()
@@ -194,12 +195,20 @@ juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor() {
 
 void AudioPluginAudioProcessor::getStateInformation(
     juce::MemoryBlock& destData) {
-  juce::ignoreUnused(destData);
+  juce::MemoryOutputStream outputStream{destData, true};
+  JsonSerializer::serialize(parameters_, outputStream);
 }
 
 void AudioPluginAudioProcessor::setStateInformation(const void* data,
                                                     int sizeInBytes) {
-  juce::ignoreUnused(data, sizeInBytes);
+  juce::MemoryInputStream inputStream{data, static_cast<size_t>(sizeInBytes), false};
+  const auto result = JsonSerializer::deserialize(inputStream, parameters_);
+
+  if (result.failed()) {
+    DBG(result.getErrorMessage());
+  }
+
+  bypassTransitioner_.setBypassForced(parameters_.bypassed.get());
 }
 
 juce::AudioProcessorParameter* AudioPluginAudioProcessor::getBypassParameter() const {
