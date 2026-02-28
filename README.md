@@ -18,9 +18,9 @@ With no particular order, here is some of the work remaining.
 - [ ] GUI control for the Q.
 - [ ] LFO with variable speed and shape that controls a selected parameter.
 - [ ] LFO control (atleast 3 LFO's to start with)
-- [ ] Refine GUI.IIR biquad filters
+- [ ] Refine GUI IIR biquad filters
 - [ ] Unit tests.
-- [ ] Capacity to save presets and reload state.
+- [X] Capacity to save presets and reload state.
 
 ## Special Mentions
 A big part of this project would not have been possible without the big amount of resources available in [Jan Wilczek's (WolfSound)](https://github.com/JanWilczek) github, videos, official website and courses. Modules such as the [JsonSerializer](https://github.com/cuervo-blanco/NIWSParametricEq/blob/main/plugin/include/NIWSParametricEq/JsonSerializer.h) and the [Bypass Transitioner](https://github.com/cuervo-blanco/NIWSParametricEq/blob/main/plugin/include/NIWSParametricEq/BypassTransitioner.h) are inspired directly from WolfSound's official [Juce Development Course](https://www.wolfsoundacademy.com/juce). 
