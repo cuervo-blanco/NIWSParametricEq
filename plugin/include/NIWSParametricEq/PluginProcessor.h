@@ -5,6 +5,7 @@
 #include "Parameters.h"
 #include "SpectrumAnalyzer.h"
 #include "BypassTransitioner.h"
+#include "Lfo.h"
 
 namespace parametric_eq {
 class AudioPluginAudioProcessor : public juce::AudioProcessor {
@@ -55,6 +56,9 @@ private:
   SpectrumAnalyzer spectrumAnalyzer_{12}; 
 
   BypassTransitioner bypassTransitioner_{0.02};
+  std::array<Lfo, ParametricEq::NUM_PEAKS> peakGainLfos_;
+  Lfo lowShelfGainLfo_;
+  Lfo highShelfGainLfo_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessor)
 };

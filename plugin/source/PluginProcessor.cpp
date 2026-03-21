@@ -1,8 +1,67 @@
 #include "NIWSParametricEq/PluginProcessor.h"
 #include "NIWSParametricEq/PluginEditor.h"
 #include "NIWSParametricEq/JsonSerializer.h"
+#include <cmath>
 
 namespace parametric_eq {
+namespace {
+enum class LfoPolarity {
+  bipolar = 0,
+  unipolar = 1,
+};
+
+Lfo::Waveform choiceIndexToWaveform(int choiceIndex) {
+  switch (choiceIndex) {
+    case 1:
+      return Lfo::Waveform::Triangle;
+    case 2:
+      return Lfo::Waveform::Square;
+    case 3:
+      return Lfo::Waveform::Saw;
+    case 0:
+    default:
+      return Lfo::Waveform::Sine;
+  }
+}
+
+LfoPolarity choiceIndexToPolarity(int choiceIndex) {
+  return choiceIndex == static_cast<int>(LfoPolarity::unipolar)
+             ? LfoPolarity::unipolar
+             : LfoPolarity::bipolar;
+}
+
+void prepareLfo(Lfo& lfo, double sampleRate, int samplesPerBlock) {
+  lfo.prepare({
+      .sampleRate = sampleRate,
+      .maximumBlockSize = static_cast<juce::uint32>(samplesPerBlock),
+      .numChannels = 1,
+  });
+}
+
+float getModulatedGainDb(const BoostCutParameters& parameters, Lfo& lfo, int numSamples) {
+  if (numSamples <= 0) {
+    return parameters.gain.get();
+  }
+
+  lfo.setFrequency(parameters.lfo.rateHz.get());
+  lfo.setWaveform(choiceIndexToWaveform(parameters.lfo.waveform.getIndex()));
+
+  if (!parameters.lfo.enabled.get()) {
+    return parameters.gain.get();
+  }
+
+  const auto depth = juce::jlimit(0.0f, 1.0f, parameters.lfo.depth.get());
+  const auto baseGainDb = parameters.gain.get();
+
+  const auto modulatedTargetGainDb =
+      choiceIndexToPolarity(parameters.lfo.polarity.getIndex()) == LfoPolarity::unipolar
+          ? baseGainDb * lfo.advanceAndGetLastUnipolarSample(numSamples)
+          : std::abs(baseGainDb) * lfo.advanceAndGetLastSample(numSamples);
+
+  return juce::jmap(depth, baseGainDb, modulatedTargetGainDb);
+}
+} // namespace
+
 AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     : AudioProcessor(
           BusesProperties()
@@ -73,10 +132,14 @@ void AudioPluginAudioProcessor::changeProgramName(int index,
 
 void AudioPluginAudioProcessor::prepareToPlay(double sampleRate,
                                               int samplesPerBlock) {
-  juce::ignoreUnused(samplesPerBlock);
   auto numChannels = std::min(getTotalNumInputChannels(), getTotalNumOutputChannels());
   parametricEq_.prepare(sampleRate, numChannels);
   spectrumAnalyzer_.prepare(sampleRate, numChannels);
+  for (auto& lfo : peakGainLfos_) {
+    prepareLfo(lfo, sampleRate, samplesPerBlock);
+  }
+  prepareLfo(lowShelfGainLfo_, sampleRate, samplesPerBlock);
+  prepareLfo(highShelfGainLfo_, sampleRate, samplesPerBlock);
   bypassTransitioner_.prepare({
     .sampleRate = sampleRate,
     .maximumBlockSize = static_cast<juce::uint32>(samplesPerBlock),
@@ -134,29 +197,35 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 
   for (size_t i = 0; i < ParametricEq::NUM_PEAKS; i++) {
     const auto& peak = parameters_.peakFilters[i];
+    const auto modulatedGainDb =
+        getModulatedGainDb(*peak, peakGainLfos_[i], buffer.getNumSamples());
     parametricEq_.setPeakParameters(
       i, 
       static_cast<double>(peak->base.frequency.get()),
       static_cast<double>(peak->base.qFactor.get()), 
-      peak->gain.get(), 
+      modulatedGainDb,
       peak->base.bypassed.get()
     );
   }
 
   const auto& lowShelf = parameters_.lowShelfParameters;
+  const auto lowShelfModulatedGainDb =
+      getModulatedGainDb(lowShelf, lowShelfGainLfo_, buffer.getNumSamples());
   parametricEq_.setLowShelfParameters(
     static_cast<double>(lowShelf.base.frequency.get()),
     static_cast<double>(lowShelf.base.qFactor.get()),
-    lowShelf.gain.get(),
+    lowShelfModulatedGainDb,
     lowShelf.base.bypassed.get(),
     lowShelf.base.slope.getIndex()
   );
 
   const auto& highShelf = parameters_.highShelfParameters;
+  const auto highShelfModulatedGainDb =
+      getModulatedGainDb(highShelf, highShelfGainLfo_, buffer.getNumSamples());
   parametricEq_.setHighShelfParameters(
     static_cast<double>(highShelf.base.frequency.get()),
     static_cast<double>(highShelf.base.qFactor.get()),
-    highShelf.gain.get(),
+    highShelfModulatedGainDb,
     highShelf.base.bypassed.get(),
     highShelf.base.slope.getIndex()
   );

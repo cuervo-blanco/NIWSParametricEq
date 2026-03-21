@@ -26,6 +26,11 @@ struct SerializableBaseParameters {
 struct SerializableBoostCutParameters {
   SerializableBaseParameters base;
   float gain = 0.0f;
+  bool lfoEnabled = false;
+  float lfoRateHz = 1.0f;
+  float lfoDepth = 1.0f;
+  juce::String lfoWaveform = "Sine";
+  juce::String lfoPolarity = "Bipolar";
 
   static constexpr int marshallingVersion = 1;
 
@@ -33,7 +38,12 @@ struct SerializableBoostCutParameters {
   static void serialise(Archive& archive, T& t) {
     using namespace juce;
     archive(named("base", t.base),
-            named("gain", t.gain));
+            named("gain", t.gain),
+            named("lfoEnabled", t.lfoEnabled),
+            named("lfoRateHz", t.lfoRateHz),
+            named("lfoDepth", t.lfoDepth),
+            named("lfoWaveform", t.lfoWaveform),
+            named("lfoPolarity", t.lfoPolarity));
   }
 };
 
@@ -90,7 +100,12 @@ static SerializableBaseParameters from(const BaseParameters& p) {
 static SerializableBoostCutParameters from(const BoostCutParameters& p) {
   return {
     .base = from(p.base),
-    .gain = p.gain.get()
+    .gain = p.gain.get(),
+    .lfoEnabled = p.lfo.enabled.get(),
+    .lfoRateHz = p.lfo.rateHz.get(),
+    .lfoDepth = p.lfo.depth.get(),
+    .lfoWaveform = p.lfo.waveform.getCurrentChoiceName(),
+    .lfoPolarity = p.lfo.polarity.getCurrentChoiceName()
   };
 }
 
@@ -129,6 +144,17 @@ static void apply(BaseParameters& dst, const SerializableBaseParameters& src) {
 static void apply(BoostCutParameters& dst, const SerializableBoostCutParameters& src) {
   apply(dst.base, src.base);
   dst.gain = src.gain;
+  dst.lfo.enabled = src.lfoEnabled;
+  dst.lfo.rateHz = src.lfoRateHz;
+  dst.lfo.depth = src.lfoDepth;
+
+  const auto waveformIndex =
+      choiceNameToIndex(dst.lfo.waveform.choices, src.lfoWaveform, dst.lfo.waveform.getIndex());
+  dst.lfo.waveform = waveformIndex;
+
+  const auto polarityIndex =
+      choiceNameToIndex(dst.lfo.polarity.choices, src.lfoPolarity, dst.lfo.polarity.getIndex());
+  dst.lfo.polarity = polarityIndex;
 }
 
 } // namespace

@@ -16,6 +16,16 @@ auto& addParameterToProcessor(juce::AudioProcessor& processor, auto parameter) {
   return result;
 }
 
+juce::AudioParameterBool& createBoolParameter(
+    juce::AudioProcessor& processor, Identifier identifier, bool defaultValue = false) {
+    return addParameterToProcessor(
+        processor,
+        std::make_unique<juce::AudioParameterBool>(
+            juce::ParameterID{identifier.id, identifier.versionHint},
+            identifier.name,
+            defaultValue));
+}
+
 juce::AudioParameterFloat& createFrequencyParameter(juce::AudioProcessor& processor, Identifier identifier, float defaultFreq = 1000.f){
     return addParameterToProcessor(
         processor,
@@ -57,14 +67,31 @@ juce::AudioParameterFloat& createGainParameter(juce::AudioProcessor& processor, 
 
 }
 
+juce::AudioParameterFloat& createLfoRateParameter(juce::AudioProcessor& processor, Identifier identifier) {
+    return addParameterToProcessor(
+        processor,
+        std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{identifier.id, identifier.versionHint},
+            identifier.name,
+            juce::NormalisableRange<float>{0.01f, 20.0f, 0.01f, 0.4f},
+            1.0f,
+            juce::AudioParameterFloatAttributes{}.withLabel("Hz")));
+}
+
+juce::AudioParameterFloat& createLfoDepthParameter(juce::AudioProcessor& processor, Identifier identifier) {
+    return addParameterToProcessor(
+        processor,
+        std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{identifier.id, identifier.versionHint},
+            identifier.name,
+            juce::NormalisableRange<float>{0.0f, 1.0f, 0.01f},
+            1.0f,
+            juce::AudioParameterFloatAttributes{}));
+}
+
 juce::AudioParameterBool& createBypassedParameter(
     juce::AudioProcessor& processor, Identifier identifier) {
-  return addParameterToProcessor(
-      processor,
-      std::make_unique<juce::AudioParameterBool>(
-          juce::ParameterID{identifier.id, identifier.versionHint}, 
-          identifier.name, 
-          false));
+  return createBoolParameter(processor, identifier, false);
 }
 
 juce::AudioParameterChoice& createSlopeParameter(
@@ -75,6 +102,45 @@ juce::AudioParameterChoice& createSlopeParameter(
           juce::ParameterID{identifier.id, identifier.versionHint},
           identifier.name, 
           juce::StringArray{"12dB/oct", "24dB/oct", "36dB/oct", "48dB/oct", "96dB/oct"}, 0));
+}
+
+juce::AudioParameterChoice& createLfoWaveformParameter(
+    juce::AudioProcessor& processor, Identifier identifier) {
+  return addParameterToProcessor(
+      processor,
+      std::make_unique<juce::AudioParameterChoice>(
+          juce::ParameterID{identifier.id, identifier.versionHint},
+          identifier.name,
+          juce::StringArray{"Sine", "Triangle", "Square", "Saw"}, 0));
+}
+
+juce::AudioParameterChoice& createLfoPolarityParameter(
+    juce::AudioProcessor& processor, Identifier identifier) {
+  return addParameterToProcessor(
+      processor,
+      std::make_unique<juce::AudioParameterChoice>(
+          juce::ParameterID{identifier.id, identifier.versionHint},
+          identifier.name,
+          juce::StringArray{"Bipolar", "Unipolar"}, 0));
+}
+
+LfoParameters createLfoParameters(
+    juce::AudioProcessor& processor,
+    const juce::String& idPrefix,
+    const juce::String& namePrefix,
+    int versionHint) {
+    auto& enabled = createBoolParameter(
+        processor, {idPrefix + "LfoEnabled", namePrefix + "LFO Enabled", versionHint}, false);
+    auto& rateHz = createLfoRateParameter(
+        processor, {idPrefix + "LfoRateHz", namePrefix + "LFO Rate", versionHint});
+    auto& depth = createLfoDepthParameter(
+        processor, {idPrefix + "LfoDepth", namePrefix + "LFO Depth", versionHint});
+    auto& waveform = createLfoWaveformParameter(
+        processor, {idPrefix + "LfoWaveform", namePrefix + "LFO Waveform", versionHint});
+    auto& polarity = createLfoPolarityParameter(
+        processor, {idPrefix + "LfoPolarity", namePrefix + "LFO Polarity", versionHint});
+
+    return {enabled, rateHz, depth, waveform, polarity};
 }
 
 BoostCutParameters createLowShelfParameters(juce::AudioProcessor& processor) {
@@ -90,8 +156,9 @@ BoostCutParameters createLowShelfParameters(juce::AudioProcessor& processor) {
     auto& gain = createGainParameter(processor, gainIdentifier);
     auto& slope = createSlopeParameter(processor, slopeIdentifier);
     auto& bypassed = createBypassedParameter(processor, bypassIdentifier);
+    auto lfo = createLfoParameters(processor, "lowShelf", "Low Shelf ", versionHint);
 
-    BoostCutParameters parameters = {{frequency, q, slope, bypassed}, gain };
+    BoostCutParameters parameters = {{frequency, q, slope, bypassed}, gain, lfo};
 
     return parameters;
 }
@@ -109,8 +176,9 @@ BoostCutParameters createHighShelfParameters(juce::AudioProcessor& processor) {
     auto& gain = createGainParameter(processor, gainIdentifier);
     auto& slope = createSlopeParameter(processor, slopeIdentifier);
     auto& bypassed = createBypassedParameter(processor, bypassIdentifier);
+    auto lfo = createLfoParameters(processor, "highShelf", "High Shelf ", versionHint);
 
-    BoostCutParameters parameters = {{frequency, q, slope, bypassed}, gain };
+    BoostCutParameters parameters = {{frequency, q, slope, bypassed}, gain, lfo};
 
     return parameters;
 }
@@ -135,9 +203,10 @@ std::array<std::unique_ptr<BoostCutParameters>, ParametricEq::NUM_PEAKS> createP
         auto& gain = createGainParameter(processor, gainIdentifier);
         auto& slope = createSlopeParameter(processor, slopeIdentifier);
         auto& bypassed = createBypassedParameter(processor, bypassIdentifier);
+        auto lfo = createLfoParameters(processor, id, name, versionHint);
 
         parameters[i] = std::unique_ptr<BoostCutParameters>(
-            new BoostCutParameters{{frequency, q, slope, bypassed }, gain});
+            new BoostCutParameters{{frequency, q, slope, bypassed }, gain, lfo});
     }
     return parameters;
 }
