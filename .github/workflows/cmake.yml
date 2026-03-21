@@ -37,12 +37,12 @@ jobs:
 
       - name: Configure (macOS)
         if: matrix.os == 'macos-14'
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DNIWS_COPY_PLUGIN_AFTER_BUILD=OFF
 
       - name: Configure (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
-        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DNIWS_COPY_PLUGIN_AFTER_BUILD=OFF
 
       - name: Build (macOS)
         if: matrix.os == 'macos-14'
@@ -52,6 +52,15 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: cmake --build build --config ${{ matrix.build_type }} --parallel
+
+      - name: Test (macOS)
+        if: matrix.os == 'macos-14'
+        run: ctest --test-dir build --build-config ${{ matrix.build_type }} --output-on-failure
+
+      - name: Test (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: ctest --test-dir build --build-config ${{ matrix.build_type }} --output-on-failure
 
       - name: Upload raw build artefacts
         uses: actions/upload-artifact@v4
@@ -104,7 +113,7 @@ jobs:
             $vst3 = Get-ChildItem -Path $vst3Dir -Filter *.vst3
             foreach ($p in $vst3) {
               $zip = Join-Path "dist" ("${{ matrix.os }}-${{ matrix.build_type }}-" + $p.Name + ".zip")
-              Compress-Archive -Path (Join-Path $p.FullName '*') -DestinationPath $zip -Force
+              Compress-Archive -Path $p.FullName -DestinationPath $zip -Force
             }
           } else {
             Write-Host "No VST3 directory at $vst3Dir"

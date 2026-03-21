@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.22)
 project(NIWSParametricEq VERSION 0.3.0)
 
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/NIWSParametricEq")
+option(NIWS_COPY_PLUGIN_AFTER_BUILD "Copy built plugin binaries into system plugin folders after build" ON)
 
 juce_add_plugin(
   ${PROJECT_NAME}
@@ -25,7 +26,7 @@ juce_add_plugin(
   PRODUCT_NAME
   "NIWS Parametric EQ"
   COPY_PLUGIN_AFTER_BUILD
-  TRUE
+  ${NIWS_COPY_PLUGIN_AFTER_BUILD}
 )
 
 set(SOURCE_FILES source/PluginEditor.cpp source/PluginProcessor.cpp
@@ -36,7 +37,8 @@ set(HEADER_FILES ${INCLUDE_DIR}/PluginEditor.h ${INCLUDE_DIR}/PluginProcessor.h
 ${INCLUDE_DIR}/filters/BiquadFilter.h ${INCLUDE_DIR}/filters/PeakFilter.h ${INCLUDE_DIR}/filters/LowShelfFilter.h
 ${INCLUDE_DIR}/filters/FilterParameters.h ${INCLUDE_DIR}/ParametricEq.h ${INCLUDE_DIR}/Parameters.h
 ${INCLUDE_DIR}/utils/RingBuffer.h ${INCLUDE_DIR}/SpectrumAnalyzer.h ${INCLUDE_DIR}/FrequencyResponseGUI.h
-${INCLUDE_DIR}/gui/FrequencyAxis.h ${INCLUDE_DIR}/gui/BandComponent.h ${INCLUDE_DIR}/JsonSerializer.h)
+${INCLUDE_DIR}/gui/FrequencyAxis.h ${INCLUDE_DIR}/gui/BandComponent.h ${INCLUDE_DIR}/JsonSerializer.h
+${INCLUDE_DIR}/Lfo.h)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES} ${HEADER_FILES})
 
