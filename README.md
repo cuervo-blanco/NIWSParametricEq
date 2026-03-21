@@ -11,15 +11,29 @@ A Simple Parametric EQ with LFOs to control parameters.
 
 The filters are built using the [Audio EQ Cookbook](https://webaudio.github.io/Audio-EQ-Cookbook/Audio-EQ-Cookbook.txt) recipes. These are IIR biquad filters that are easy to understand in their construction, which is why I've chosen them for this plugin. 
 
+## Current LFO Status
+
+The plugin now has backend support for per-filter LFO modulation on gain-capable bands.
+
+- Each peak filter has its own LFO.
+- The low-shelf and high-shelf filters each have their own LFO.
+- The current modulation target is filter gain / amplitude.
+- LFO parameters currently include enabled state, rate, depth, waveform, and polarity.
+- LFO state is saved and restored with the rest of the plugin state.
+- No frontend controls have been added for these LFO parameters yet.
+
 ## Work in Progress
 With no particular order, here is some of the work remaining.
 
 - [ ] Higher Order filters.
 - [ ] GUI control for the Q.
-- [ ] LFO with variable speed and shape that controls a selected parameter.
-- [ ] LFO control (atleast 3 LFO's to start with)
+- [x] Backend LFO support with variable speed and shape for gain-capable filter bands.
+- [x] Per-filter LFO instances for the 4 peak filters and both shelf filters.
+- [ ] Frontend controls for the new LFO parameters.
+- [ ] Expand LFO modulation to additional filter parameters beyond gain / amplitude.
 - [ ] Refine GUI IIR biquad filters
-- [ ] Unit tests.
+- [x] Basic regression coverage for processor state serialization.
+- [ ] Broader unit test coverage.
 - [X] Capacity to save presets and reload state.
 
 ## Special Mentions
