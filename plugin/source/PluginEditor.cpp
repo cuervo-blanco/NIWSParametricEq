@@ -45,6 +45,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
 
     addAndMakeVisible(frequencyResponseGUI_);
     addAndMakeVisible(frequencyAxis_);
+    addChildComponent(filterInspectorPanel_);
     addAndMakeVisible(peakBand0_);
     addAndMakeVisible(peakBand1_);
     addAndMakeVisible(peakBand2_);
@@ -81,6 +82,39 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     highShelfBand_.updateFromParameters();
     lowShelfBand_.setDbRange(-40.0f, 40.0f);
     lowShelfBand_.updateFromParameters();
+
+    peakBand0_.setInteractionCallback([this]() {
+        auto& peak = *processorRef.getParameters().peakFilters[0];
+        selectFilter(peakBand0_, {"Peak 1", &peak.base, &peak.gain, &peak.lfo});
+    });
+    peakBand1_.setInteractionCallback([this]() {
+        auto& peak = *processorRef.getParameters().peakFilters[1];
+        selectFilter(peakBand1_, {"Peak 2", &peak.base, &peak.gain, &peak.lfo});
+    });
+    peakBand2_.setInteractionCallback([this]() {
+        auto& peak = *processorRef.getParameters().peakFilters[2];
+        selectFilter(peakBand2_, {"Peak 3", &peak.base, &peak.gain, &peak.lfo});
+    });
+    peakBand3_.setInteractionCallback([this]() {
+        auto& peak = *processorRef.getParameters().peakFilters[3];
+        selectFilter(peakBand3_, {"Peak 4", &peak.base, &peak.gain, &peak.lfo});
+    });
+    lowPassBand_.setInteractionCallback([this]() {
+        auto& parameters = processorRef.getParameters().lowPassParameters;
+        selectFilter(lowPassBand_, {"Low Pass", &parameters, nullptr, nullptr});
+    });
+    highPassBand_.setInteractionCallback([this]() {
+        auto& parameters = processorRef.getParameters().highPassParameters;
+        selectFilter(highPassBand_, {"High Pass", &parameters, nullptr, nullptr});
+    });
+    highShelfBand_.setInteractionCallback([this]() {
+        auto& parameters = processorRef.getParameters().highShelfParameters;
+        selectFilter(highShelfBand_, {"High Shelf", &parameters.base, &parameters.gain, &parameters.lfo});
+    });
+    lowShelfBand_.setInteractionCallback([this]() {
+        auto& parameters = processorRef.getParameters().lowShelfParameters;
+        selectFilter(lowShelfBand_, {"Low Shelf", &parameters.base, &parameters.gain, &parameters.lfo});
+    });
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor() {}
@@ -93,6 +127,7 @@ void AudioPluginAudioProcessorEditor::resized() {
     auto bounds = getLocalBounds().reduced(10); 
     frequencyResponseGUI_.setBounds(bounds);
     frequencyAxis_.setBounds(bounds);
+    filterInspectorPanel_.setBounds(bounds.withTrimmedTop(bounds.getHeight() - 180));
     peakBand0_.setBounds(bounds);
     peakBand1_.setBounds(bounds);
     peakBand2_.setBounds(bounds);
@@ -120,6 +155,20 @@ void AudioPluginAudioProcessorEditor::timerCallback() {
     highPassBand_.updateFromParameters();
     highShelfBand_.updateFromParameters();
     lowShelfBand_.updateFromParameters();
+}
+
+void AudioPluginAudioProcessorEditor::selectFilter(BandComponent& band, FilterSelection selection) {
+    selectedBand_ = &band;
+    filterInspectorPanel_.showSelection(selection);
+
+    peakBand0_.setSelected(selectedBand_ == &peakBand0_);
+    peakBand1_.setSelected(selectedBand_ == &peakBand1_);
+    peakBand2_.setSelected(selectedBand_ == &peakBand2_);
+    peakBand3_.setSelected(selectedBand_ == &peakBand3_);
+    lowPassBand_.setSelected(selectedBand_ == &lowPassBand_);
+    highPassBand_.setSelected(selectedBand_ == &highPassBand_);
+    highShelfBand_.setSelected(selectedBand_ == &highShelfBand_);
+    lowShelfBand_.setSelected(selectedBand_ == &lowShelfBand_);
 }
 
 }  // namespace parametric_eq
