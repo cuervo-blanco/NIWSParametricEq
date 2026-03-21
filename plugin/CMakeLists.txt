@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(NIWSParametricEq VERSION 0.2.0)
+project(NIWSParametricEq VERSION 0.3.0)
 
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/NIWSParametricEq")
 
