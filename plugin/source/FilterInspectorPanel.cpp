@@ -44,6 +44,13 @@ void styleToggleButton(juce::ToggleButton& button) {
     button.setColour(juce::ToggleButton::textColourId, panelText);
 }
 
+void styleTextButton(juce::TextButton& button) {
+    button.setColour(juce::TextButton::buttonColourId, panelControlBackground);
+    button.setColour(juce::TextButton::buttonOnColourId, panelControlBackground.brighter(0.15f));
+    button.setColour(juce::TextButton::textColourOffId, panelText);
+    button.setColour(juce::TextButton::textColourOnId, panelText);
+}
+
 int getDecimalPlaces(float interval) {
     if (interval <= 0.0f) {
         return 2;
@@ -167,6 +174,7 @@ void FilterInspectorPanel::ToggleField::resized() {
 FilterInspectorPanel::FilterInspectorPanel() {
     addAndMakeVisible(titleLabel_);
     addAndMakeVisible(hintLabel_);
+    addAndMakeVisible(closeButton_);
 
     styleLabel(titleLabel_, juce::Justification::centredLeft, 18.0f);
     titleLabel_.setFont(juce::Font{juce::FontOptions(18.0f, juce::Font::bold)});
@@ -174,6 +182,9 @@ FilterInspectorPanel::FilterInspectorPanel() {
     hintLabel_.setJustificationType(juce::Justification::centredLeft);
     hintLabel_.setFont(juce::Font{juce::FontOptions(13.0f, juce::Font::plain)});
     hintLabel_.setColour(juce::Label::textColourId, panelMutedText);
+
+    styleTextButton(closeButton_);
+    closeButton_.onClick = [this]() { handleCloseButton(); };
 
     const auto addField = [this](auto& field) {
         addAndMakeVisible(field);
@@ -192,6 +203,10 @@ FilterInspectorPanel::FilterInspectorPanel() {
     addField(lfoPolarityField_);
 
     setVisible(false);
+}
+
+void FilterInspectorPanel::setCloseCallback(std::function<void()> callback) {
+    closeCallback_ = std::move(callback);
 }
 
 void FilterInspectorPanel::showSelection(Selection selection) {
@@ -229,8 +244,9 @@ void FilterInspectorPanel::paint(juce::Graphics& g) {
 void FilterInspectorPanel::resized() {
     auto bounds = getLocalBounds().reduced(10);
     auto headerBounds = bounds.removeFromTop(22);
-
+    auto closeBounds = headerBounds.removeFromRight(76);
     titleLabel_.setBounds(headerBounds);
+    closeButton_.setBounds(closeBounds.reduced(0, 1));
     hintLabel_.setBounds(bounds.removeFromTop(16));
     bounds.removeFromTop(6);
 
@@ -322,6 +338,14 @@ void FilterInspectorPanel::refreshFields() {
         lfoDepthField_.bind(selection_.lfo->depth);
         lfoWaveformField_.bind(selection_.lfo->waveform);
         lfoPolarityField_.bind(selection_.lfo->polarity);
+    }
+}
+
+void FilterInspectorPanel::handleCloseButton() {
+    clearSelection();
+
+    if (closeCallback_ != nullptr) {
+        closeCallback_();
     }
 }
 }  // namespace parametric_eq

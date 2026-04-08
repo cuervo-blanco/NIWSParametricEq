@@ -19,6 +19,7 @@ private:
 
   void timerCallback() override;
   void selectFilter(BandComponent& band, FilterSelection selection);
+  void clearSelectedFilter();
 
   AudioPluginAudioProcessor& processorRef;
   FrequencyAxis frequencyAxis_;

@@ -64,6 +64,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     frequencyResponseGUI_.setInterceptsMouseClicks(false, false);
     frequencyResponseGUI_.setSampleRate(processorRef.getSampleRate());
 
+    filterInspectorPanel_.setCloseCallback([this]() { clearSelectedFilter(); });
+
     peakBand0_.setDbRange(-40.0f, 40.0f);
     peakBand0_.updateFromParameters();
     peakBand1_.setDbRange(-40.0f, 40.0f);
@@ -161,6 +163,20 @@ void AudioPluginAudioProcessorEditor::selectFilter(BandComponent& band, FilterSe
     selectedBand_ = &band;
     filterInspectorPanel_.showSelection(selection);
 
+    peakBand0_.setSelected(selectedBand_ == &peakBand0_);
+    peakBand1_.setSelected(selectedBand_ == &peakBand1_);
+    peakBand2_.setSelected(selectedBand_ == &peakBand2_);
+    peakBand3_.setSelected(selectedBand_ == &peakBand3_);
+    lowPassBand_.setSelected(selectedBand_ == &lowPassBand_);
+    highPassBand_.setSelected(selectedBand_ == &highPassBand_);
+    highShelfBand_.setSelected(selectedBand_ == &highShelfBand_);
+    lowShelfBand_.setSelected(selectedBand_ == &lowShelfBand_);
+}
+
+void AudioPluginAudioProcessorEditor::clearSelectedFilter() {
+    selectedBand_ = nullptr;
+
+    filterInspectorPanel_.clearSelection();
     peakBand0_.setSelected(selectedBand_ == &peakBand0_);
     peakBand1_.setSelected(selectedBand_ == &peakBand1_);
     peakBand2_.setSelected(selectedBand_ == &peakBand2_);

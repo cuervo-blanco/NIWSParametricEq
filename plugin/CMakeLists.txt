@@ -9,6 +9,8 @@ juce_add_plugin(
   ${PROJECT_NAME}
   COMPANY_NAME
   "NIWS"
+  BUNDLE_ID
+  "com.niws.parametriceq"
   IS_SYNTH
   FALSE 
   NEEDS_MIDI_INPUT
@@ -25,6 +27,10 @@ juce_add_plugin(
   AU
   PRODUCT_NAME
   "NIWS Parametric EQ"
+  MICROPHONE_PERMISSION_ENABLED
+  TRUE
+  MICROPHONE_PERMISSION_TEXT
+  "NIWS Parametric EQ needs audio input access in the standalone app so it can receive and analyze incoming audio."
   COPY_PLUGIN_AFTER_BUILD
   ${NIWS_COPY_PLUGIN_AFTER_BUILD}
 )

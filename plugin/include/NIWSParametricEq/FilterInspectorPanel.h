@@ -2,6 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <functional>
 
 #include "filters/FilterParameters.h"
 
@@ -18,6 +19,7 @@ public:
     FilterInspectorPanel();
     ~FilterInspectorPanel() override = default;
 
+    void setCloseCallback(std::function<void()> callback);
     void showSelection(Selection selection);
     void clearSelection();
     bool hasSelection() const noexcept;
@@ -63,11 +65,14 @@ private:
     };
 
     void refreshFields();
+    void handleCloseButton();
 
     Selection selection_;
 
     juce::Label titleLabel_;
     juce::Label hintLabel_;
+    juce::TextButton closeButton_{"Close"};
+    std::function<void()> closeCallback_;
 
     SliderField frequencyField_{"Frequency"};
     SliderField qField_{"Q"};
