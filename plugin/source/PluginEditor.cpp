@@ -43,8 +43,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     setSize(1080, 450);
     startTimerHz(30);
 
-    addAndMakeVisible(frequencyResponseGUI_);
     addAndMakeVisible(frequencyAxis_);
+    addAndMakeVisible(frequencyResponseGUI_);
     addChildComponent(filterInspectorPanel_);
     addAndMakeVisible(peakBand0_);
     addAndMakeVisible(peakBand1_);
