@@ -22,6 +22,11 @@ private:
   void clearSelectedFilter();
 
   AudioPluginAudioProcessor& processorRef;
+  juce::TextButton postButton_{"Post"};
+  juce::TextButton bypassButton_{"Bypass"};
+  std::unique_ptr<juce::ButtonParameterAttachment> postAttachment_;
+  std::unique_ptr<juce::ButtonParameterAttachment> bypassAttachment_;
+
   FrequencyAxis frequencyAxis_;
   FrequencyResponseGUI frequencyResponseGUI_;
   FilterInspectorPanel filterInspectorPanel_;

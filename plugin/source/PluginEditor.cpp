@@ -4,6 +4,17 @@
 #include "NIWSParametricEq/Parameters.h"
 
 namespace parametric_eq {
+namespace {
+void styleUtilityButton(juce::TextButton& button, const juce::String& tooltip) {
+    button.setClickingTogglesState(true);
+    button.setColour(juce::TextButton::buttonColourId, juce::Colour(22, 22, 22));
+    button.setColour(juce::TextButton::buttonOnColourId, juce::Colour(222, 140, 0));
+    button.setColour(juce::TextButton::textColourOffId, juce::Colours::white.withAlpha(0.9f));
+    button.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+    button.setTooltip(tooltip);
+}
+}  // namespace
+
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     AudioPluginAudioProcessor& p)
     : AudioProcessorEditor(&p), processorRef(p),
@@ -54,6 +65,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     addAndMakeVisible(highPassBand_);
     addAndMakeVisible(highShelfBand_);
     addAndMakeVisible(lowShelfBand_);
+    addAndMakeVisible(postButton_);
+    addAndMakeVisible(bypassButton_);
 
     auto bands = processorRef.getParametricEq().getBands();
 
@@ -65,6 +78,13 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
     frequencyResponseGUI_.setSampleRate(processorRef.getSampleRate());
 
     filterInspectorPanel_.setCloseCallback([this]() { clearSelectedFilter(); });
+    styleUtilityButton(postButton_, "When enabled, the analyzer reads the EQ output instead of the input.");
+    styleUtilityButton(bypassButton_, "Temporarily bypass the entire EQ.");
+
+    postAttachment_ = std::make_unique<juce::ButtonParameterAttachment>(
+        processorRef.getParameters().isPost, postButton_);
+    bypassAttachment_ = std::make_unique<juce::ButtonParameterAttachment>(
+        processorRef.getParameters().bypassed, bypassButton_);
 
     peakBand0_.setDbRange(-40.0f, 40.0f);
     peakBand0_.updateFromParameters();
@@ -126,7 +146,14 @@ void AudioPluginAudioProcessorEditor::paint(juce::Graphics& g) {
 }
 
 void AudioPluginAudioProcessorEditor::resized() {
-    auto bounds = getLocalBounds().reduced(10); 
+    auto bounds = getLocalBounds().reduced(10);
+    auto controlBounds = bounds.removeFromTop(30);
+    auto buttonBounds = controlBounds.removeFromRight(182);
+
+    postButton_.setBounds(buttonBounds.removeFromLeft(82));
+    buttonBounds.removeFromLeft(8);
+    bypassButton_.setBounds(buttonBounds.removeFromLeft(92));
+
     frequencyResponseGUI_.setBounds(bounds);
     frequencyAxis_.setBounds(bounds);
     filterInspectorPanel_.setBounds(bounds.withTrimmedTop(bounds.getHeight() - 180));
