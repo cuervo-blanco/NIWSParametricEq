@@ -32,10 +32,17 @@ void FrequencyResponseGUI::paint(juce::Graphics& g) {
 
     displayMagnitudes = blendedMagnitudes;
 
-    juce::Path spectrumPath;
-    bool pathStarted = false;
-
     const auto nyquist = static_cast<float>(sampleRate_ * 0.5);
+    const auto baselineY = bounds.getBottom() - 1.0f;
+    constexpr auto minStemSpacingPx = 8.0f;
+
+    struct StemPoint {
+        float x;
+        float y;
+    };
+
+    std::vector<StemPoint> stemPoints;
+    stemPoints.reserve(static_cast<size_t>(numBins));
 
     for (int bin = 0; bin < numBins; ++bin) {
         auto freq = juce::jmap(static_cast<float>(bin),
@@ -58,12 +65,12 @@ void FrequencyResponseGUI::paint(juce::Graphics& g) {
 
         auto normY = juce::jmap(dbForY, -visibleHeadroomDb, visibleHeadroomDb, 1.0f, 0.0f);
         auto y = juce::jmap(normY, 0.0f, 1.0f, bounds.getY(), bounds.getBottom());
-
-        if (!pathStarted) {
-            spectrumPath.startNewSubPath(x, y);
-            pathStarted = true;
+        if (!stemPoints.empty() && std::abs(x - stemPoints.back().x) < minStemSpacingPx) {
+            if (y < stemPoints.back().y) {
+                stemPoints.back() = { x, y };
+            }
         } else {
-            spectrumPath.lineTo(x, y);
+            stemPoints.push_back({ x, y });
         }
     }
 
@@ -74,6 +81,15 @@ void FrequencyResponseGUI::paint(juce::Graphics& g) {
     g.reduceClipRegion(clip.toNearestInt());
 
     g.setColour(juce::Colours::white);
-    g.strokePath(spectrumPath, juce::PathStrokeType(1.5f));
+    constexpr auto stemThickness = 1.2f;
+    constexpr auto markerRadius = 2.5f;
+
+    for (const auto& point : stemPoints) {
+        g.drawLine(point.x, baselineY, point.x, point.y, stemThickness);
+        g.fillEllipse(point.x - markerRadius,
+                      point.y - markerRadius,
+                      markerRadius * 2.0f,
+                      markerRadius * 2.0f);
+    }
 }
 }// namespace parametric_eq

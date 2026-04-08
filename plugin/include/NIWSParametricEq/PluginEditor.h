@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PluginProcessor.h"
+#include "FilterInspectorPanel.h"
 #include "FrequencyResponseGUI.h"
 #include "gui/FrequencyAxis.h"
 #include "gui/BandComponent.h"
@@ -14,11 +15,21 @@ public:
   void resized() override;
 
 private:
+  using FilterSelection = FilterInspectorPanel::Selection;
+
   void timerCallback() override;
+  void selectFilter(BandComponent& band, FilterSelection selection);
+  void clearSelectedFilter();
 
   AudioPluginAudioProcessor& processorRef;
+  juce::TextButton postButton_{"Post"};
+  juce::TextButton bypassButton_{"Bypass"};
+  std::unique_ptr<juce::ButtonParameterAttachment> postAttachment_;
+  std::unique_ptr<juce::ButtonParameterAttachment> bypassAttachment_;
+
   FrequencyAxis frequencyAxis_;
   FrequencyResponseGUI frequencyResponseGUI_;
+  FilterInspectorPanel filterInspectorPanel_;
 
   BandComponent peakBand0_;
   BandComponent peakBand1_;
@@ -30,6 +41,7 @@ private:
 
   BandComponent highShelfBand_;
   BandComponent lowShelfBand_;
+  BandComponent* selectedBand_ { nullptr };
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessorEditor)
 };

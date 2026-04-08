@@ -1,6 +1,7 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <functional>
 
 #include "../filters/BiquadFilter.h" 
 #include "FrequencyAxis.h"
@@ -46,6 +47,19 @@ public:
         repaint();
     }
 
+    void setInteractionCallback(std::function<void()> callback) {
+        onInteractionStart_ = std::move(callback);
+    }
+
+    void setSelected(bool isSelected) {
+        if (selected_ == isSelected) {
+            return;
+        }
+
+        selected_ = isSelected;
+        repaint();
+    }
+
     BandType getType() const noexcept { return type_; }
 
     void updateFromParameters() {
@@ -66,6 +80,10 @@ public:
         dragStartPos_ = e.getPosition().toFloat();
         startFreq_ = freq_;
         startGainDb_ = gainDb_;
+
+        if (onInteractionStart_) {
+            onInteractionStart_();
+        }
 
         freqParam_.beginChangeGesture();
         gainParam_.beginChangeGesture();
@@ -112,6 +130,14 @@ public:
         auto bounds = getLocalBounds().toFloat();
         auto centre = getHandlePosition(bounds);
         const auto radius = 6.0f;
+
+        if (selected_) {
+            g.setColour(juce::Colour(222, 140, 0).withAlpha(0.28f));
+            g.fillEllipse(centre.x - (radius + 7.0f),
+                          centre.y - (radius + 7.0f),
+                          2.0f * (radius + 7.0f),
+                          2.0f * (radius + 7.0f));
+        }
 
         g.setColour(juce::Colours::white);
         g.fillEllipse(centre.x - (radius + 1.0f),
@@ -195,4 +221,6 @@ private:
     float startGainDb_{0.0f};
 
     bool hasGain_ { true };
+    bool selected_ { false };
+    std::function<void()> onInteractionStart_;
 };
